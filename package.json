@@ -2,7 +2,10 @@
   "name": "kuocli",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "commons:deploy:local": "nx build commons && npm publish dist/packages/commons/ --tag latest --registry http://localhost:4873/",
+    "prepare": "husky install"
+  },
   "private": true,
   "devDependencies": {
     "@nrwl/devkit": "15.7.2",

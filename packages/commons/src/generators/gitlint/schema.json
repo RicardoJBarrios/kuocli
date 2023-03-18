@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "cli": "nx",
+  "$id": "Gitlint",
+  "title": "Git Lint Schema",
+  "description": "Adhere to a git commit convention.",
+  "type": "object",
+  "properties": {
+    "appScopes": {
+      "type": "boolean",
+      "default": true,
+      "description": "Add existing applications as commit scopes.",
+      "x-priority": "important"
+    },
+    "libScopes": {
+      "type": "boolean",
+      "default": true,
+      "description": "Add existing libraries as commit scopes.",
+      "x-priority": "important"
+    },
+    "scopes": {
+      "type": "string",
+      "description": "A comma-separated list of custom commit scopes."
+    },
+    "skipFormat": {
+      "description": "Skip formatting files.",
+      "type": "boolean",
+      "default": false,
+      "x-priority": "internal"
+    }
+  },
+  "required": []
+}

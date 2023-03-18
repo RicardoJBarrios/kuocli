@@ -3,10 +3,10 @@
   "name": "commons",
   "version": "0.0.1",
   "generators": {
-    "commons": {
-      "factory": "./src/generators/commons/generator",
-      "schema": "./src/generators/commons/schema.json",
-      "description": "commons generator"
+    "gitlint": {
+      "factory": "./src/generators/gitlint/generator",
+      "schema": "./src/generators/gitlint/schema.json",
+      "description": "Adhere to a git commit convention."
     }
   }
 }
