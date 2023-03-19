@@ -6,7 +6,7 @@
     "gitlint": {
       "factory": "./src/generators/gitlint/generator",
       "schema": "./src/generators/gitlint/schema.json",
-      "description": "Adhere to a git commit convention."
+      "description": "Adhere the workspace to a git commit convention."
     }
   }
 }

@@ -1,7 +1,7 @@
 import { createTreeWithEmptyWorkspace } from '@nrwl/devkit/testing';
 import { addProjectConfiguration, Tree } from '@nrwl/devkit';
 import * as devKit from '@nrwl/devkit';
-import { getJsonFile, getPackageJsonDevDepsKeys } from '../../utils';
+import { getJsonFile, getWorkspaceDevDependencies } from '../../utils';
 import generator from './generator';
 
 describe('Git Lint Generator', () => {
@@ -107,7 +107,7 @@ describe('Git Lint Generator', () => {
 
   it('adds commitlint dependencies', async () => {
     await generator(tree, {});
-    const devDeps = getPackageJsonDevDepsKeys(tree);
+    const devDeps = getWorkspaceDevDependencies(tree);
     expect(devDeps).toEqual(
       expect.arrayContaining([
         '@commitlint/cli',
@@ -120,13 +120,13 @@ describe('Git Lint Generator', () => {
 
   it('adds commitizen dependency', async () => {
     await generator(tree, {});
-    const devDeps = getPackageJsonDevDepsKeys(tree);
+    const devDeps = getWorkspaceDevDependencies(tree);
     expect(devDeps).toEqual(expect.arrayContaining(['commitizen']));
   });
 
   it('adds husky dependency', async () => {
     await generator(tree, {});
-    const devDeps = getPackageJsonDevDepsKeys(tree);
+    const devDeps = getWorkspaceDevDependencies(tree);
     expect(devDeps).toEqual(expect.arrayContaining(['husky']));
   });
 
