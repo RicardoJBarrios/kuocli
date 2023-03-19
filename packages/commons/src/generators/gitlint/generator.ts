@@ -8,8 +8,8 @@ import {
 import { join } from 'path';
 import { GitlintGeneratorSchema } from './schema';
 import {
-  addScriptToPackageJson,
-  filterEmptyValues,
+  addScriptToWorkspace,
+  filterEmptyStringValues,
   getProjectNamesByType,
 } from '../../utils';
 
@@ -44,7 +44,7 @@ function normalizeOptions(
     parsedScopes = parsedScopes.concat(libraries);
   }
 
-  parsedScopes = filterEmptyValues(parsedScopes);
+  parsedScopes = filterEmptyStringValues(parsedScopes);
 
   return {
     ...finalOptions,
@@ -83,7 +83,7 @@ function addDependencies(tree: Tree) {
 function prepareHusky(tree: Tree) {
   tree.changePermissions('.husky/commit-msg', '755');
   tree.changePermissions('.husky/prepare-commit-msg', '755');
-  addScriptToPackageJson(tree, 'prepare', 'husky install');
+  addScriptToWorkspace(tree, 'prepare', 'husky install');
 }
 
 export default async function (tree: Tree, options: GitlintGeneratorSchema) {
