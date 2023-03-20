@@ -1,12 +1,6 @@
 # @kuocli/commons:gitlint
 
-Adhere the workspace to a git commit convention.
-
-## Usage
-
-```bash
-nx generate @kuocli/commons:gitlint
-```
+> Adhere the workspace to a git commit convention.
 
 This generator adds and configures [commitlint](https://commitlint.js.org/), [husky](https://typicode.github.io/husky/#/) and [commitizen](http://commitizen.github.io/cz-cli/) to the workspace to force the use of [conventional commits](https://www.conventionalcommits.org/) on git commits.
 
@@ -14,10 +8,16 @@ Running `git commit` will display a prompt that will guide the user to complete 
 
 ![cz-commitlint](https://commitlint.js.org/assets/cz-commitlint.png)
 
-To modify the default behavior modify the following values in the generated `/commitlintrc` file:
+To modify the default behavior edit the following values in the generated `/commitlintrc` file:
 
 - [rules](https://commitlint.js.org/#/reference-rules): any rules defined here will override rules from @commitlint/config-conventional, so use it carefully. Is highly recomended to restrict the scopes, and it's done by default in the generation by adding the existing application and libraries names to `scope-enum`.
 - [prompt](https://commitlint.js.org/#/reference-prompt): configures the commit prompt settings when using @commitlint/cz-commitlint. This allows to change the text of the options, add emojis, skip steps, etc.
+
+## Usage
+
+```bash
+nx generate @kuocli/commons:gitlint
+```
 
 Show what will be generated without writing to disk:
 
