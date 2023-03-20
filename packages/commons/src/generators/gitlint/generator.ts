@@ -35,8 +35,8 @@ function normalizeOptions(
     : [];
 
   if (finalOptions.appScopes) {
-    const applicatins = getProjectNamesByType(tree, 'application');
-    parsedScopes = parsedScopes.concat(applicatins);
+    const applications = getProjectNamesByType(tree, 'application');
+    parsedScopes = parsedScopes.concat(applications);
   }
 
   if (finalOptions.libScopes) {
