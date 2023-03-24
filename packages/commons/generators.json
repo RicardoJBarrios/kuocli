@@ -7,6 +7,21 @@
       "factory": "./src/generators/gitlint/generator",
       "schema": "./src/generators/gitlint/schema.json",
       "description": "Adhere the workspace to a git commit convention."
+    },
+    "codelint": {
+      "factory": "./src/generators/codelint/generator",
+      "schema": "./src/generators/codelint/schema.json",
+      "description": "Static check on source code to detect stylistic or programmatic errors."
+    },
+    "init": {
+      "factory": "./src/generators/init/generator",
+      "schema": "./src/generators/init/schema.json",
+      "description": "Add the default git and code linting configuration to the workspace."
+    },
+    "semver": {
+      "factory": "./src/generators/semver/generator",
+      "schema": "./src/generators/semver/schema.json",
+      "description": "Versioning using SemVer and CHANGELOG generation."
     }
   }
 }

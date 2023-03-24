@@ -4,10 +4,13 @@
   "license": "MIT",
   "scripts": {
     "commons:deploy:local": "nx build commons && npm publish dist/packages/commons/ --tag latest --registry http://localhost:4873/",
-    "prepare": "husky install"
+    "prepare": "husky install && husky install"
   },
   "private": true,
   "devDependencies": {
+    "@commitlint/cli": "~17.4.4",
+    "@commitlint/config-conventional": "~17.4.4",
+    "@commitlint/cz-commitlint": "~17.4.4",
     "@nrwl/devkit": "15.7.2",
     "@nrwl/eslint-plugin-nx": "15.7.2",
     "@nrwl/jest": "15.7.2",
@@ -22,8 +25,14 @@
     "@types/node": "16.11.7",
     "@typescript-eslint/eslint-plugin": "^5.36.1",
     "@typescript-eslint/parser": "^5.36.1",
+    "commitizen": "~4.3.0",
     "eslint": "~8.15.0",
     "eslint-config-prettier": "8.1.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-simple-import-sort": "^10.0.0",
+    "eslint-plugin-unused-imports": "^2.0.0",
+    "husky": "~8.0.3",
+    "inquirer": "~8.0.0",
     "jest": "28.1.1",
     "jest-environment-jsdom": "28.1.1",
     "jsonc-eslint-parser": "^2.1.0",

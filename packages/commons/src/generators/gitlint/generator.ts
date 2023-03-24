@@ -6,12 +6,14 @@ import {
   Tree,
 } from '@nrwl/devkit';
 import { join } from 'path';
-import { GitlintGeneratorSchema } from './schema';
+
+import { SHARED_HUSKY } from '../../shared';
 import {
   addScriptToWorkspace,
   filterEmptyStringValues,
   getProjectNamesByType,
 } from '../../utils';
+import { GitlintGeneratorSchema } from './schema';
 
 interface NormalizedSchema extends GitlintGeneratorSchema {
   workspaceRoot: string;
@@ -69,11 +71,11 @@ function addFiles(tree: Tree, options: NormalizedSchema) {
 
 function addDependencies(tree: Tree) {
   const devDependencies = {
+    ...SHARED_HUSKY,
     '@commitlint/cli': '~17.4.4',
     '@commitlint/config-conventional': '~17.4.4',
     '@commitlint/cz-commitlint': '~17.4.4',
     commitizen: '~4.3.0',
-    husky: '~8.0.3',
     inquirer: '~8.0.0',
   };
 

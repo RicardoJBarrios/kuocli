@@ -1,0 +1,19 @@
+{
+  "extends": [
+    "@commitlint/config-conventional"
+  ],
+  "rules": {
+    "scope-enum": [
+      2,
+      "always",
+      [
+        "commons",
+        "gitlint",
+        "codelint",
+        "init",
+        "semver"
+      ]
+    ]
+  },
+  "prompt": {}
+}

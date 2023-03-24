@@ -2,9 +2,9 @@
 
 > Adhere the workspace to a git commit convention.
 
-This generator adds and configures [commitlint](https://commitlint.js.org/), [husky](https://typicode.github.io/husky/#/) and [commitizen](http://commitizen.github.io/cz-cli/) to the workspace to force the use of [conventional commits](https://www.conventionalcommits.org/) on git commits.
+This generator adds and configures [commitlint](https://commitlint.js.org/), [husky](https://typicode.github.io/husky/#/) and [commitizen](http://commitizen.github.io/cz-cli/) in the workspace to force the use of [conventional commits](https://www.conventionalcommits.org/) on git commits.
 
-Running `git commit` will display a prompt that will guide the user to complete a Git Commit containing all the necessary items configured in the linter, and `husky` will ensure that those rules are followed or will abort the commit.
+Running `git commit` displays a prompt that guides the user to complete a git commit containing all the needed items configured in the linter, and uses `husky` to ensure that those rules are followed.
 
 ![cz-commitlint](https://commitlint.js.org/assets/cz-commitlint.png)
 
@@ -34,6 +34,10 @@ nx generate @kuocli/commons:gitlint --dry-run
 
 Add existing applications as commit scopes.
 
+```bash
+nx generate @kuocli/commons:gitlint --appScopes false
+```
+
 ### libScopes
 
 - Type: boolean
@@ -41,11 +45,19 @@ Add existing applications as commit scopes.
 
 Add existing libraries as commit scopes.
 
+```bash
+nx generate @kuocli/commons:gitlint --libScopes false
+```
+
 ### scopes
 
 - Type: string
 
 A comma-separated list of custom commit scopes.
+
+```bash
+nx generate @kuocli/commons:gitlint --scopes test1,test2
+```
 
 ### skipFormat
 
@@ -53,3 +65,7 @@ A comma-separated list of custom commit scopes.
 - Default: false
 
 Skip formatting files.
+
+```bash
+nx generate @kuocli/commons:gitlint --skipFormat true
+```

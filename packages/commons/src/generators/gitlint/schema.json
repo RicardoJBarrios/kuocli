@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/schema",
   "cli": "nx",
   "$id": "Gitlint",
-  "title": "Git Lint Schema",
+  "title": "Gitlint Schema",
   "description": "Adhere the workspace to a git commit convention.",
   "type": "object",
   "properties": {

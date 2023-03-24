@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "cli": "nx",
+  "$id": "Codelint",
+  "title": "Coselint",
+  "description": "Static check on source code to detect stylistic or programmatic errors.",
+  "type": "object",
+  "properties": {
+    "skipFormat": {
+      "description": "Skip formatting files.",
+      "type": "boolean",
+      "default": false,
+      "x-priority": "internal"
+    }
+  },
+  "required": []
+}

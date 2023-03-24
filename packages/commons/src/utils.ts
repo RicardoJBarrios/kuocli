@@ -72,12 +72,51 @@ export function addScriptToWorkspace(
 ) {
   const path = 'package.json';
   const packageJson = getJsonFile(tree, path);
+  const scripts = packageJson?.scripts as Record<string, string> | undefined;
+  let scriptCode: string | undefined = packageJson?.scripts?.[scriptName];
+  if (scriptCode !== undefined) {
+    scriptCode = scriptCode.includes(script)
+      ? scriptCode
+      : `${scriptCode} && ${script}`;
+  } else {
+    scriptCode = script;
+  }
   packageJson.scripts = {
-    ...((packageJson?.scripts as object) ?? {}),
-    [scriptName]: packageJson?.scripts?.[scriptName]
-      ? `${packageJson.scripts[scriptName]} && ${script}`
-      : script,
+    ...(scripts ?? {}),
+    [scriptName]: scriptCode,
   };
 
   tree.write(path, JSON.stringify(packageJson));
+}
+
+/**
+ * Gets the dependency version installed in the workspace.
+ * @param tree The current generator tree.
+ * @returns The NX version installed in the workspace or null if there is no installed.
+ */
+export function getInstalledVersion(
+  tree: Tree,
+  depName: string
+): string | null {
+  const path = 'package.json';
+  const packageJson = getJsonFile(tree, path);
+  const version =
+    packageJson.dependencies[depName] ?? packageJson.devDependencies[depName];
+
+  return version ?? null;
+}
+
+export function addVSCodeRecommendation(tree: Tree, extension: string) {
+  const filePath = '.vscode/extensions.json';
+  const extensions = getJsonFile(tree, filePath) ?? {};
+  const recommendations: string[] = extensions.recommendations
+    ? (extensions.recommendations as string[])
+    : [];
+
+  if (!recommendations.includes(extension)) {
+    recommendations.push(extension);
+  }
+
+  extensions.recommendations = recommendations;
+  tree.write(filePath, JSON.stringify(extensions));
 }
