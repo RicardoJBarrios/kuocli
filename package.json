@@ -3,8 +3,10 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
+    "format:all": "nx format:write --all",
+    "lint:all": "nx run-many --all --target=lint --fix",
     "commons:deploy:local": "nx build commons && npm publish dist/packages/commons/ --tag latest --registry http://localhost:4873/",
-    "prepare": "husky install && husky install"
+    "prepare": "husky install"
   },
   "private": true,
   "devDependencies": {
@@ -22,6 +24,7 @@
     "@swc/cli": "~0.1.55",
     "@swc/core": "^1.2.173",
     "@types/jest": "28.1.1",
+    "@types/lodash": "^4.14.191",
     "@types/node": "16.11.7",
     "@typescript-eslint/eslint-plugin": "^5.36.1",
     "@typescript-eslint/parser": "^5.36.1",
@@ -44,6 +47,7 @@
   },
   "dependencies": {
     "@swc/helpers": "~0.4.11",
+    "lodash": "^4.17.21",
     "tslib": "^2.3.0"
   }
 }

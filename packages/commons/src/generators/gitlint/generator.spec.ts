@@ -2,23 +2,22 @@ import { addProjectConfiguration, Tree } from '@nrwl/devkit';
 import * as devKit from '@nrwl/devkit';
 import { createTreeWithEmptyWorkspace } from '@nrwl/devkit/testing';
 
-import { getJsonFile, getWorkspaceDevDependencies } from '../../utils';
+import { getJsonFile } from '../../utils/get-json-file';
+import { getWorkspaceDependencies } from '../../utils/get-workspace-dependencies';
 import generator from './generator';
 
-describe('Gitlint generator', () => {
+describe('gitlint generator', () => {
   let tree: Tree;
 
   beforeEach(() => {
     tree = createTreeWithEmptyWorkspace({ layout: 'apps-libs' });
     addProjectConfiguration(tree, 'app1', {
       projectType: 'application',
-      sourceRoot: 'apps/app1/src',
-      root: 'apps/app1',
+      root: 'apps/app1'
     });
     addProjectConfiguration(tree, 'lib1', {
       projectType: 'library',
-      sourceRoot: 'libs/lib1/src',
-      root: 'libs/lib1',
+      root: 'libs/lib1'
     });
   });
 
@@ -75,7 +74,7 @@ describe('Gitlint generator', () => {
       await generator(tree, {
         scopes: 'test1',
         appScopes: false,
-        libScopes: false,
+        libScopes: false
       });
       const json = getJsonFile(tree, '.commitlintrc');
       expect(json['rules']['scope-enum'][2]).toEqual(['test1']);
@@ -85,7 +84,7 @@ describe('Gitlint generator', () => {
       await generator(tree, {
         scopes: 'test1, test2',
         appScopes: false,
-        libScopes: false,
+        libScopes: false
       });
       const json = getJsonFile(tree, '.commitlintrc');
       expect(json['rules']['scope-enum'][2]).toEqual(['test1', 'test2']);
@@ -95,7 +94,7 @@ describe('Gitlint generator', () => {
       await generator(tree, {
         scopes: ' test1 ,, ,',
         appScopes: true,
-        libScopes: true,
+        libScopes: true
       });
       const json = getJsonFile(tree, '.commitlintrc');
       expect(json['rules']['scope-enum'][2]).toEqual(['test1', 'app1', 'lib1']);
@@ -111,26 +110,26 @@ describe('Gitlint generator', () => {
   describe('addDependencies', () => {
     it('adds commitlint dependencies', async () => {
       await generator(tree, {});
-      const devDeps = getWorkspaceDevDependencies(tree);
+      const devDeps = getWorkspaceDependencies(tree, 'devDependencies');
       expect(devDeps).toEqual(
         expect.arrayContaining([
           '@commitlint/cli',
           '@commitlint/config-conventional',
           '@commitlint/cz-commitlint',
-          'inquirer',
+          'inquirer'
         ])
       );
     });
 
     it('adds commitizen dependency', async () => {
       await generator(tree, {});
-      const devDeps = getWorkspaceDevDependencies(tree);
+      const devDeps = getWorkspaceDependencies(tree, 'devDependencies');
       expect(devDeps).toEqual(expect.arrayContaining(['commitizen']));
     });
 
     it('adds husky dependency', async () => {
       await generator(tree, {});
-      const devDeps = getWorkspaceDevDependencies(tree);
+      const devDeps = getWorkspaceDependencies(tree, 'devDependencies');
       expect(devDeps).toEqual(expect.arrayContaining(['husky']));
     });
   });
@@ -142,11 +141,7 @@ describe('Gitlint generator', () => {
       await generator(tree, {});
       expect(spy).toHaveBeenCalledTimes(2);
       expect(spy).toHaveBeenNthCalledWith(1, '.husky/commit-msg', '755');
-      expect(spy).toHaveBeenNthCalledWith(
-        2,
-        '.husky/prepare-commit-msg',
-        '755'
-      );
+      expect(spy).toHaveBeenNthCalledWith(2, '.husky/prepare-commit-msg', '755');
       spy.mockReset();
     });
 
@@ -154,7 +149,7 @@ describe('Gitlint generator', () => {
       await generator(tree, {});
       const packageJsonPost = getJsonFile(tree, 'package.json');
       expect(packageJsonPost.scripts).toEqual({
-        prepare: 'husky install',
+        prepare: 'husky install'
       });
     });
   });

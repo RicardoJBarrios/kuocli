@@ -1,3 +1,6 @@
 const nxPreset = require('@nrwl/jest/preset').default;
 
-module.exports = { ...nxPreset, detectOpenHandles: true };
+module.exports = {
+  ...nxPreset,
+  detectOpenHandles: true
+};

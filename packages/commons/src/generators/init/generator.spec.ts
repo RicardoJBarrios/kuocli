@@ -1,4 +1,4 @@
-import { readProjectConfiguration,Tree } from '@nrwl/devkit';
+import { readProjectConfiguration, Tree } from '@nrwl/devkit';
 import { createTreeWithEmptyWorkspace } from '@nrwl/devkit/testing';
 
 import generator from './generator';
@@ -9,7 +9,7 @@ describe('init generator', () => {
   const options: InitGeneratorSchema = { name: 'test' };
 
   beforeEach(() => {
-    appTree = createTreeWithEmptyWorkspace({layout: 'apps-libs'});
+    appTree = createTreeWithEmptyWorkspace({ layout: 'apps-libs' });
   });
 
   it('should run successfully', async () => {

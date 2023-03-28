@@ -2,23 +2,57 @@ import { addProjectConfiguration, Tree } from '@nrwl/devkit';
 import * as devKit from '@nrwl/devkit';
 import { createTreeWithEmptyWorkspace } from '@nrwl/devkit/testing';
 
-import { getJsonFile, getWorkspaceDevDependencies } from '../../utils';
+import { getJsonFile } from '../../utils/get-json-file';
+import { getWorkspaceDependencies } from '../../utils/get-workspace-dependencies';
+import { upsertJsonFile } from '../../utils/upsert-json-file';
 import generator from './generator';
 
-describe('Codelint generator', () => {
+const eslintConfig = {
+  files: ['*.ts', '*.tsx', '*.js', '*.jsx'],
+  plugins: ['simple-import-sort', 'import', 'unused-imports'],
+  rules: {
+    'simple-import-sort/imports': 'error',
+    'simple-import-sort/exports': 'error',
+    'import/first': 'error',
+    'import/newline-after-import': 'error',
+    'import/no-duplicates': 'error',
+    '@typescript-eslint/no-unused-vars': 'off',
+    'unused-imports/no-unused-imports': 'error',
+    'unused-imports/no-unused-vars': [
+      'warn',
+      {
+        vars: 'all',
+        varsIgnorePattern: '^_',
+        args: 'after-used',
+        argsIgnorePattern: '^_'
+      }
+    ]
+  }
+};
+
+function addEslintDevDependency(tree: Tree) {
+  upsertJsonFile(tree, 'package.json', (json) => {
+    json.devDependencies = {
+      ...((json.devDependencies ?? []) as []),
+      eslint: 'latest'
+    };
+
+    return json;
+  });
+}
+
+describe('codelint generator', () => {
   let tree: Tree;
 
   beforeEach(() => {
     tree = createTreeWithEmptyWorkspace({ layout: 'apps-libs' });
     addProjectConfiguration(tree, 'app1', {
       projectType: 'application',
-      sourceRoot: 'apps/app1/src',
-      root: 'apps/app1',
+      root: 'apps/app1'
     });
     addProjectConfiguration(tree, 'lib1', {
       projectType: 'library',
-      sourceRoot: 'libs/lib1/src',
-      root: 'libs/lib1',
+      root: 'libs/lib1'
     });
   });
 
@@ -51,59 +85,47 @@ describe('Codelint generator', () => {
   describe('addDependencies', () => {
     it('adds prettier dependency', async () => {
       await generator(tree, {});
-      const devDeps = getWorkspaceDevDependencies(tree);
+      const devDeps = getWorkspaceDependencies(tree, 'devDependencies');
       expect(devDeps).toEqual(expect.arrayContaining(['prettier']));
     });
 
     it('adds lint-staged dependency', async () => {
       await generator(tree, {});
-      const devDeps = getWorkspaceDevDependencies(tree);
+      const devDeps = getWorkspaceDependencies(tree, 'devDependencies');
       expect(devDeps).toEqual(expect.arrayContaining(['lint-staged']));
     });
 
     it('adds husky dependency', async () => {
       await generator(tree, {});
-      const devDeps = getWorkspaceDevDependencies(tree);
+      const devDeps = getWorkspaceDependencies(tree, 'devDependencies');
       expect(devDeps).toEqual(expect.arrayContaining(['husky']));
     });
 
     it(`doesn't add eslint dependencies`, async () => {
       await generator(tree, {});
-      const devDeps = getWorkspaceDevDependencies(tree);
-      expect(devDeps).not.toEqual(
-        expect.arrayContaining(['eslint-plugin-import'])
-      );
+      const devDeps = getWorkspaceDependencies(tree, 'devDependencies');
+      expect(devDeps).not.toEqual(expect.arrayContaining(['eslint-plugin-import']));
     });
 
     it('adds eslint-plugin-import dependency', async () => {
-      const json = getJsonFile(tree, 'package.json');
-      json.devDependencies = { eslint: '' };
-      tree.write('package.json', JSON.stringify(json));
+      addEslintDevDependency(tree);
       await generator(tree, {});
-      const devDeps = getWorkspaceDevDependencies(tree);
+      const devDeps = getWorkspaceDependencies(tree, 'devDependencies');
       expect(devDeps).toEqual(expect.arrayContaining(['eslint-plugin-import']));
     });
 
     it('adds eslint-plugin-simple-import-sort dependency', async () => {
-      const json = getJsonFile(tree, 'package.json');
-      json.devDependencies = { eslint: '' };
-      tree.write('package.json', JSON.stringify(json));
+      addEslintDevDependency(tree);
       await generator(tree, {});
-      const devDeps = getWorkspaceDevDependencies(tree);
-      expect(devDeps).toEqual(
-        expect.arrayContaining(['eslint-plugin-simple-import-sort'])
-      );
+      const devDeps = getWorkspaceDependencies(tree, 'devDependencies');
+      expect(devDeps).toEqual(expect.arrayContaining(['eslint-plugin-simple-import-sort']));
     });
 
     it('adds eslint-plugin-unused-imports dependency', async () => {
-      const json = getJsonFile(tree, 'package.json');
-      json.devDependencies = { eslint: '' };
-      tree.write('package.json', JSON.stringify(json));
+      addEslintDevDependency(tree);
       await generator(tree, {});
-      const devDeps = getWorkspaceDevDependencies(tree);
-      expect(devDeps).toEqual(
-        expect.arrayContaining(['eslint-plugin-unused-imports'])
-      );
+      const devDeps = getWorkspaceDependencies(tree, 'devDependencies');
+      expect(devDeps).toEqual(expect.arrayContaining(['eslint-plugin-unused-imports']));
     });
   });
 
@@ -122,7 +144,7 @@ describe('Codelint generator', () => {
       const packageJsonPost = getJsonFile(tree, 'package.json');
       expect(packageJsonPost.scripts).toEqual(
         expect.objectContaining({
-          prepare: 'husky install',
+          prepare: 'husky install'
         })
       );
     });
@@ -132,9 +154,7 @@ describe('Codelint generator', () => {
     it('adds VS Code Extensions', async () => {
       await generator(tree, {});
       const json = getJsonFile(tree, '.vscode/extensions.json');
-      expect(json.recommendations).toEqual(
-        expect.arrayContaining(['esbenp.prettier-vscode'])
-      );
+      expect(json.recommendations).toEqual(expect.arrayContaining(['esbenp.prettier-vscode']));
     });
 
     it('adds format:all script', async () => {
@@ -142,20 +162,29 @@ describe('Codelint generator', () => {
       const packageJsonPost = getJsonFile(tree, 'package.json');
       expect(packageJsonPost.scripts).toEqual(
         expect.objectContaining({
-          'format:all': 'nx format:write --all',
+          'format:all': 'nx format:write --all'
         })
       );
     });
   });
 
   describe('prepareEslint', () => {
-    // it('add...', async () => {
-    //   await generator(tree, {});
-    //   const json = getJsonFile(tree, '.vscode/extensions.json');
-    //   expect(json.recommendations).toEqual(
-    //     expect.arrayContaining(['esbenp.prettier-vscode'])
-    //   );
-    // });
+    it('modifies .eslintrc.json', async () => {
+      const filePath = '.eslintrc.json';
+      upsertJsonFile(tree, filePath, () => ({ overrides: [] }));
+      addEslintDevDependency(tree);
+      await generator(tree, {});
+      const json = getJsonFile(tree, filePath);
+      expect(json.overrides).toEqual(expect.arrayContaining([eslintConfig]));
+    });
+
+    it('add lint to lint-staged', async () => {
+      const filePath = '.lintstagedrc';
+      addEslintDevDependency(tree);
+      await generator(tree, {});
+      const json = getJsonFile(tree, filePath);
+      expect(json['*.{js,jsx,ts,tsx}']).toEqual(expect.arrayContaining(['nx affected:lint --fix --files']));
+    });
   });
 
   describe('skipFormat', () => {

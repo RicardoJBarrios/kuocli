@@ -1,7 +1,10 @@
 {
   "name": "@kuocli/commons",
-  "version": "0.0.22",
+  "version": "0.0.25",
   "main": "src/index.js",
   "generators": "./generators.json",
-  "executors": "./executors.json"
+  "executors": "./executors.json",
+  "dependencies": {
+    "lodash": "^4.17.21"
+  }
 }

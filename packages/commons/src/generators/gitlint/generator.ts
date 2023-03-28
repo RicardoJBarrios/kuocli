@@ -1,18 +1,10 @@
-import {
-  addDependenciesToPackageJson,
-  formatFiles,
-  generateFiles,
-  installPackagesTask,
-  Tree,
-} from '@nrwl/devkit';
+import { addDependenciesToPackageJson, formatFiles, generateFiles, installPackagesTask, Tree } from '@nrwl/devkit';
 import { join } from 'path';
 
 import { SHARED_HUSKY } from '../../shared';
-import {
-  addScriptToWorkspace,
-  filterEmptyStringValues,
-  getProjectNamesByType,
-} from '../../utils';
+import { addScriptToWorkspace } from '../../utils/add-script-to-workspace';
+import { cleanStringArray } from '../../utils/clean-string-array';
+import { getProjectNamesByType } from '../../utils/get-project-names';
 import { GitlintGeneratorSchema } from './schema';
 
 interface NormalizedSchema extends GitlintGeneratorSchema {
@@ -20,53 +12,34 @@ interface NormalizedSchema extends GitlintGeneratorSchema {
   parsedScopes: string[];
 }
 
-function normalizeOptions(
-  tree: Tree,
-  options: GitlintGeneratorSchema
-): NormalizedSchema {
+function normalizeOptions(tree: Tree, options: GitlintGeneratorSchema): NormalizedSchema {
   const finalOptions = {
     appScopes: true,
     libScopes: true,
     skipFormat: false,
-    ...options,
+    ...options
   };
-
   const workspaceRoot = '/';
-  let parsedScopes = options.scopes
-    ? options.scopes.split(',').map((s) => s.trim())
-    : [];
-
-  if (finalOptions.appScopes) {
-    const applications = getProjectNamesByType(tree, 'application');
-    parsedScopes = parsedScopes.concat(applications);
-  }
-
-  if (finalOptions.libScopes) {
-    const libraries = getProjectNamesByType(tree, 'library');
-    parsedScopes = parsedScopes.concat(libraries);
-  }
-
-  parsedScopes = filterEmptyStringValues(parsedScopes);
+  const parsedScopes = cleanStringArray([
+    ...(finalOptions.scopes ? finalOptions.scopes.split(',') : []),
+    ...(finalOptions.appScopes ? getProjectNamesByType(tree, 'application') : []),
+    ...(finalOptions.libScopes ? getProjectNamesByType(tree, 'library') : [])
+  ]);
 
   return {
     ...finalOptions,
     workspaceRoot,
-    parsedScopes,
+    parsedScopes
   };
 }
 
 function addFiles(tree: Tree, options: NormalizedSchema) {
   const templateOptions = {
     ...options,
-    template: '',
+    template: ''
   };
 
-  generateFiles(
-    tree,
-    join(__dirname, 'files'),
-    options.workspaceRoot,
-    templateOptions
-  );
+  generateFiles(tree, join(__dirname, 'files'), options.workspaceRoot, templateOptions);
 }
 
 function addDependencies(tree: Tree) {
@@ -76,7 +49,7 @@ function addDependencies(tree: Tree) {
     '@commitlint/config-conventional': '~17.4.4',
     '@commitlint/cz-commitlint': '~17.4.4',
     commitizen: '~4.3.0',
-    inquirer: '~8.0.0',
+    inquirer: '~8.0.0'
   };
 
   addDependenciesToPackageJson(tree, {}, devDependencies);

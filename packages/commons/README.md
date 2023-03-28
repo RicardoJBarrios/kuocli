@@ -80,14 +80,10 @@ Gets the devDependencies from the workspace package.json.
 ### addScriptToWorkspace
 
 ```ts
-function addScriptToWorkspace(
-  tree: Tree,
-  scriptName: string,
-  script: string
-): void;
+function addScriptToWorkspace(tree: Tree, scriptName: string, script: string): void;
 ```
 
-Adds a script to the workspace package.json. If the script name exists adds the code to be executed after the current code.
+Adds a script to the workspace package.json. If the script name exists adds the code to be executed after the current code. Doesn't repeat the script.
 
 ```js
 // /package.json
@@ -99,6 +95,16 @@ Adds a script to the workspace package.json. If the script name exists adds the 
 
 addScriptToWorkspace(tree, "notDone", "echo NOT DONE");
 addScriptToWorkspace(tree, "prepare", "echo DONE AGAIN");
+
+// /package.json
+{
+  "scripts": {
+    "notDone": "echo NOT DONE"
+    "prepare": 'echo DONE && echo DONE AGAIN';
+  }
+}
+
+addScriptToWorkspace(tree, "prepare", "echo DONE");
 
 // /package.json
 {
