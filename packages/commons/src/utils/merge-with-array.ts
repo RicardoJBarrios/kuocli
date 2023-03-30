@@ -1,17 +1,19 @@
 import mergeWith from 'lodash/mergeWith';
 
-function customizer(objValue: object, srcValue: unknown) {
-  if (Array.isArray(objValue)) {
-    return objValue.concat(srcValue);
-  }
-}
+import { cleanStringArray } from './clean-string-array';
 
 /**
- * Merges properties, including Arrays, of source objects to the destination object.
- * @param obj The destination object.
- * @param sources The source objects.
- * @returns The merged objects.
+ * Merges properties of source objects to the destination object concatenating Arrays without duplicates
+ * @param obj Destination object
+ * @param sources Source objects
+ * @returns The merged objects
  */
-export function mergeWithArray<T extends Record<string, unknown>, K = T>(obj: T, ...sources: K[]): T | K {
+export function mergeWithArray<T = Record<string, unknown>>(obj: T, ...sources: object[]): T {
+  const customizer = (objValue: object, srcValue: unknown) => {
+    if (Array.isArray(objValue)) {
+      return cleanStringArray(objValue.concat(srcValue));
+    }
+  };
+
   return mergeWith(obj, ...sources, customizer);
 }

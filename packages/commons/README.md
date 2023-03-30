@@ -38,18 +38,10 @@ This functions have been created to help in the creation and testing of Nx gener
 ### addIdePluginRecommendations
 
 ```ts
-function addIdePluginRecommendations(tree: Tree, ...extensions: string[]): Record<string, unknown>;
+function addIdePluginRecommendations(tree: Tree, ...extensions: string[]): void;
 ```
 
 Adds plugin recommendations to the IDE.
-
-### addIdeSettings
-
-```ts
-function addIdeSettings(tree: Tree, settings: Record<string, unknown>): Record<string, unknown>;
-```
-
-Adds settings to the IDE.
 
 ### addScriptToWorkspace
 
@@ -117,16 +109,10 @@ function mergeWithArray<T extends Record<string, unknown>, K = T>(obj: T, ...sou
 
 Merges properties, including Arrays, of source objects to the destination object.
 
-### upsertJsonFile
+### upsertIDESettings
 
 ```ts
-function upsertJsonFile(
-  tree: Tree,
-  filePath: string,
-  mutator: (json: Record<string, unknown>) => Record<string, unknown>
-): Record<string, unknown> | null;
+function upsertIDESettings(tree: Tree, settings: Record<string, unknown>): void;
 ```
 
-Creates or updates a JSON file.
-
-Returns the mutated JSON or null if the content is not a valid JSON file or throws.
+Creates or updates the IDE settings file with the new settings.

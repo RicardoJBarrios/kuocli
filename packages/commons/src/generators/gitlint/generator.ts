@@ -2,9 +2,7 @@ import { addDependenciesToPackageJson, formatFiles, generateFiles, installPackag
 import { join } from 'path';
 
 import { SHARED_HUSKY } from '../../shared';
-import { addScriptToWorkspace } from '../../utils/add-script-to-workspace';
-import { cleanStringArray } from '../../utils/clean-string-array';
-import { getProjectNamesByType } from '../../utils/get-project-names-by-type';
+import { addScript, cleanStringArray, getProjectNamesByType } from '../../utils';
 import { GitlintGeneratorSchema } from './schema';
 
 interface NormalizedSchema extends GitlintGeneratorSchema {
@@ -58,7 +56,7 @@ function addDependencies(tree: Tree) {
 function prepareHusky(tree: Tree) {
   tree.changePermissions('.husky/commit-msg', '755');
   tree.changePermissions('.husky/prepare-commit-msg', '755');
-  addScriptToWorkspace(tree, 'prepare', 'husky install');
+  addScript(tree, 'prepare', 'husky install');
 }
 
 export default async function (tree: Tree, options: GitlintGeneratorSchema) {

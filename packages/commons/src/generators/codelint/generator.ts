@@ -5,17 +5,19 @@ import {
   generateFiles,
   installPackagesTask,
   PackageManager,
-  Tree
+  Tree,
+  updateJson
 } from '@nrwl/devkit';
 import { join } from 'path';
 
 import { SHARED_HUSKY } from '../../shared';
-import { mergeWithArray } from '../../utils';
-import { addIdePluginRecommendations } from '../../utils/add-ide-plugin-recommendations';
-import { addIdeSettings } from '../../utils/add-ide-settings';
-import { addScriptToWorkspace } from '../../utils/add-script-to-workspace';
-import { getWorkspaceDependencies } from '../../utils/get-workspace-dependencies';
-import { upsertJsonFile } from '../../utils/upsert-json-file';
+import {
+  addScript,
+  getDependencies,
+  mergeWithArray,
+  upsertIDEExtensionRecommendations,
+  upsertIDESettings
+} from '../../utils';
 import { CodelintGeneratorSchema } from './schema';
 
 interface NormalizedSchema extends CodelintGeneratorSchema {
@@ -42,7 +44,7 @@ function addFiles(tree: Tree, options: NormalizedSchema) {
 }
 
 function hasEslint(tree: Tree): boolean {
-  return getWorkspaceDependencies(tree, 'devDependencies').includes('eslint');
+  return getDependencies(tree, 'devDependencies').includes('eslint');
 }
 
 function modifyEslintConfig(tree: Tree) {
@@ -63,7 +65,7 @@ function modifyEslintConfig(tree: Tree) {
     ]
   };
 
-  upsertJsonFile(tree, '.eslintrc.json', (json) => {
+  updateJson(tree, '.eslintrc.json', (json) => {
     return mergeWithArray(json, eslintConfig);
   });
 }
@@ -71,7 +73,7 @@ function modifyEslintConfig(tree: Tree) {
 function addEslintToLintStaged(tree: Tree) {
   const lintAffected = { '*.{js,jsx,ts,tsx}': ['nx affected:lint --fix --files'] };
 
-  upsertJsonFile(tree, '.lintstagedrc', (json) => {
+  updateJson(tree, '.lintstagedrc', (json) => {
     return mergeWithArray(json, lintAffected);
   });
 }
@@ -92,9 +94,9 @@ function addDependencies(tree: Tree) {
 }
 
 function preparePrettier(tree: Tree) {
-  addIdePluginRecommendations(tree, 'esbenp.prettier-vscode');
-  addScriptToWorkspace(tree, 'format:all', 'nx format:write --all');
-  addIdeSettings(tree, {
+  upsertIDEExtensionRecommendations(tree, 'esbenp.prettier-vscode');
+  addScript(tree, 'format:all', 'nx format:write --all');
+  upsertIDESettings(tree, {
     'editor.defaultFormatter': 'esbenp.prettier-vscode',
     'editor.formatOnSave': true,
     'editor.rulers': [120]
@@ -103,11 +105,11 @@ function preparePrettier(tree: Tree) {
 
 function prepareEslint(tree: Tree) {
   if (hasEslint(tree)) {
-    addIdePluginRecommendations(tree, 'dbaeumer.vscode-eslint');
-    addScriptToWorkspace(tree, 'lint:all', 'nx run-many --all --target=lint --fix');
+    upsertIDEExtensionRecommendations(tree, 'dbaeumer.vscode-eslint');
+    addScript(tree, 'lint:all', 'nx run-many --all --target=lint --fix');
     modifyEslintConfig(tree);
     addEslintToLintStaged(tree);
-    addIdeSettings(tree, {
+    upsertIDESettings(tree, {
       'editor.codeActionsOnSave': {
         'source.fixAll.eslint': true
       }
@@ -116,8 +118,8 @@ function prepareEslint(tree: Tree) {
 }
 
 function prepareCodemetrics(tree: Tree) {
-  addIdePluginRecommendations(tree, 'kisstkondoros.vscode-codemetrics');
-  addIdeSettings(tree, {
+  upsertIDEExtensionRecommendations(tree, 'kisstkondoros.vscode-codemetrics');
+  upsertIDESettings(tree, {
     'codemetrics.basics.ComplexityLevelExtreme': 25,
     'codemetrics.basics.ComplexityLevelExtremeDescription': 'Extreme',
     'codemetrics.basics.ComplexityLevelHigh': 10,
@@ -133,8 +135,8 @@ function prepareCodemetrics(tree: Tree) {
 }
 
 function prepareSonarlint(tree: Tree) {
-  addIdePluginRecommendations(tree, 'SonarSource.sonarlint-vscode');
-  addIdeSettings(tree, {
+  upsertIDEExtensionRecommendations(tree, 'SonarSource.sonarlint-vscode');
+  upsertIDESettings(tree, {
     'sonarlint.analyzerProperties': {
       'sonar.typescript.exclusions': '**/*.spec.ts,**/test-setup.ts'
     }
@@ -147,7 +149,7 @@ function prepareEditorconfig(tree: Tree) {
 
 function prepareHusky(tree: Tree) {
   tree.changePermissions('.husky/pre-commit', '755');
-  addScriptToWorkspace(tree, 'prepare', 'husky install');
+  addScript(tree, 'prepare', 'husky install');
 }
 
 function prepareSecurityCheck(tree: Tree) {
