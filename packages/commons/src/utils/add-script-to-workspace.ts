@@ -1,5 +1,5 @@
 import { Tree } from '@nrwl/devkit';
-import { mergeWith } from 'lodash';
+import mergeWith from 'lodash/mergeWith';
 
 import { upsertJsonFile } from './upsert-json-file';
 

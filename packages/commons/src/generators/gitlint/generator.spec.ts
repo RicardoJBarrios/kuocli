@@ -1,10 +1,17 @@
 import { addProjectConfiguration, Tree } from '@nrwl/devkit';
-import * as devKit from '@nrwl/devkit';
+import * as DevKit from '@nrwl/devkit';
 import { createTreeWithEmptyWorkspace } from '@nrwl/devkit/testing';
 
-import { getJsonFile } from '../../utils/get-json-file';
-import { getWorkspaceDependencies } from '../../utils/get-workspace-dependencies';
+import { getJsonFile, getWorkspaceDependencies } from '../../utils';
 import generator from './generator';
+
+jest.mock('@nrwl/devkit', () => {
+  const original = jest.requireActual('@nrwl/devkit');
+  return {
+    ...original,
+    formatFiles: jest.fn()
+  };
+});
 
 describe('gitlint generator', () => {
   let tree: Tree;
@@ -155,28 +162,37 @@ describe('gitlint generator', () => {
   });
 
   describe('skipFormat', () => {
+    let spy: jest.SpyInstance<Promise<void>, [tree: Tree]>;
+
+    beforeAll(() => {
+      jest.resetAllMocks();
+    });
+
+    beforeEach(() => {
+      spy = jest.spyOn(DevKit, 'formatFiles');
+    });
+
+    afterEach(() => {
+      jest.resetAllMocks();
+      spy.mockReset();
+    });
+
     it('format files if no "skipFormat"', async () => {
-      const spy = jest.spyOn(devKit, 'formatFiles');
       expect(spy).not.toHaveBeenCalled();
       await generator(tree, {});
       expect(spy).toHaveBeenCalledTimes(1);
-      spy.mockReset();
     });
 
     it('format files if "skipFormat" false', async () => {
-      const spy = jest.spyOn(devKit, 'formatFiles');
       expect(spy).not.toHaveBeenCalled();
       await generator(tree, { skipFormat: false });
       expect(spy).toHaveBeenCalledTimes(1);
-      spy.mockReset();
     });
 
     it('dont format files if "skipFormat" true', async () => {
-      const spy = jest.spyOn(devKit, 'formatFiles');
       expect(spy).not.toHaveBeenCalled();
       await generator(tree, { skipFormat: true });
       expect(spy).not.toHaveBeenCalled();
-      spy.mockReset();
     });
   });
 });

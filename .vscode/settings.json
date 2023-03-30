@@ -23,5 +23,10 @@
   "codemetrics.basics.ComplexityLevelLowDescription": "Low",
   "codemetrics.basics.ComplexityTemplate": "{1} complexity: {0}",
   "codemetrics.basics.DecorationModeEnabled": false,
-  "codemetrics.basics.Exclude": ["**/*.spec.ts"]
+  "codemetrics.basics.Exclude": ["**/*.spec.ts"],
+
+  // SonarSource.sonarlint-vscode
+  "sonarlint.analyzerProperties": {
+    "sonar.typescript.exclusions": "**/*.spec.ts,**/test-setup.ts"
+  }
 }

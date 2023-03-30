@@ -28,22 +28,70 @@ None.
 
 ### Generators
 
-- [init](./src/generators/init/README.md): Add the default git and code linting configuration to the workspace.
 - [gitlint](./src/generators/gitlint/README.md): Adhere the workspace to a git commit convention.
 - [codelint](./src/generators/codelint/README.md): Static check on source code to detect stylistic or programmatic errors.
-- [semver](./src/generators/semver/README.md): Versioning using SemVer and CHANGELOG generation.
 
 ## Utils
 
 This functions have been created to help in the creation and testing of Nx generators.
 
-### filterEmptyStringValues
+### addIdePluginRecommendations
 
 ```ts
-function filterEmptyStringValues(array: string[]): string[];
+function addIdePluginRecommendations(tree: Tree, ...extensions: string[]): Record<string, unknown>;
 ```
 
-Filters empty string values from an Array.
+Adds plugin recommendations to the IDE.
+
+### addIdeSettings
+
+```ts
+function addIdeSettings(tree: Tree, settings: Record<string, unknown>): Record<string, unknown>;
+```
+
+Adds settings to the IDE.
+
+### addScriptToWorkspace
+
+```ts
+function addScriptToWorkspace(tree: Tree, scriptName: string, scriptCode: string): void;
+```
+
+Adds a script to the workspace's package.json.
+
+If the script name exists and is not duplicated, adds the code to be executed after the current code.
+
+### cleanStringArray
+
+```ts
+function cleanStringArray(array: string[]): string[];
+```
+
+Cleans values from an Array of strings.
+
+Returns the Array without duplicates, nil or empty values and value's ending and trailing white space.
+
+### DEPENDENCY_TYPE
+
+```ts
+type DEPENDENCY_TYPE =
+  | 'dependencies'
+  | 'devDependencies'
+  | 'peerDependencies'
+  | 'peerDependenciesMeta'
+  | 'bundleDependencies'
+  | 'optionalDependencies';
+```
+
+The dependency type in package.json.
+
+### getJsonFile
+
+```ts
+function getJsonFile(tree: Tree, filePath: string): Record<string, unknown> | null;
+```
+
+Returns the parsed JSON file value or null if the file doesn't exist or is not a valid JSON file.
 
 ### getProjectNamesByType
 
@@ -53,64 +101,32 @@ function getProjectNamesByType(tree: Tree, projectType: ProjectType): string[];
 
 Gets the list of workspace project names by type.
 
-### getJsonFile
-
-```ts
-function getJsonFile(tree: Tree, path: string): Record<string, unknown> | null;
-```
-
-Gets a parsed JSON File or null if the file doen't exists.
-
 ### getWorkspaceDependencies
 
 ```ts
-function getWorkspaceDependencies(tree: Tree): string[];
+function getWorkspaceDependencies(tree: Tree, ...filterTypes: DEPENDENCY_TYPE[]): string[];
 ```
 
-Gets the dependencies from the workspace package.json.
+Gets the list of library names in the workspace package.json dependencies.
 
-### getWorkspaceDevDependencies
+### mergeWithArray
 
 ```ts
-function getWorkspaceDevDependencies(tree: Tree): string[];
+function mergeWithArray<T extends Record<string, unknown>, K = T>(obj: T, ...sources: K[]): T | K;
 ```
 
-Gets the devDependencies from the workspace package.json.
+Merges properties, including Arrays, of source objects to the destination object.
 
-### addScriptToWorkspace
+### upsertJsonFile
 
 ```ts
-function addScriptToWorkspace(tree: Tree, scriptName: string, script: string): void;
+function upsertJsonFile(
+  tree: Tree,
+  filePath: string,
+  mutator: (json: Record<string, unknown>) => Record<string, unknown>
+): Record<string, unknown> | null;
 ```
 
-Adds a script to the workspace package.json. If the script name exists adds the code to be executed after the current code. Doesn't repeat the script.
+Creates or updates a JSON file.
 
-```js
-// /package.json
-{
-  "scripts": {
-    "prepare": 'echo DONE';
-  }
-}
-
-addScriptToWorkspace(tree, "notDone", "echo NOT DONE");
-addScriptToWorkspace(tree, "prepare", "echo DONE AGAIN");
-
-// /package.json
-{
-  "scripts": {
-    "notDone": "echo NOT DONE"
-    "prepare": 'echo DONE && echo DONE AGAIN';
-  }
-}
-
-addScriptToWorkspace(tree, "prepare", "echo DONE");
-
-// /package.json
-{
-  "scripts": {
-    "notDone": "echo NOT DONE"
-    "prepare": 'echo DONE && echo DONE AGAIN';
-  }
-}
-```
+Returns the mutated JSON or null if the content is not a valid JSON file or throws.

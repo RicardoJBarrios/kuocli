@@ -5,37 +5,14 @@
   "overrides": [
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
-      "plugins": ["simple-import-sort", "import", "unused-imports"],
+      "plugins": ["simple-import-sort", "unused-imports"],
       "rules": {
+        "no-unused-vars": "off",
+        "@typescript-eslint/no-unused-vars": "off",
         "simple-import-sort/imports": "error",
         "simple-import-sort/exports": "error",
-        "import/first": "error",
-        "import/newline-after-import": "error",
-        "import/no-duplicates": "error",
-        "@typescript-eslint/no-unused-vars": "off",
         "unused-imports/no-unused-imports": "error",
-        "unused-imports/no-unused-vars": [
-          "warn",
-          {
-            "vars": "all",
-            "varsIgnorePattern": "^_",
-            "args": "after-used",
-            "argsIgnorePattern": "^_"
-          }
-        ],
-        "@nrwl/nx/enforce-module-boundaries": [
-          "error",
-          {
-            "enforceBuildableLibDependency": true,
-            "allow": [],
-            "depConstraints": [
-              {
-                "sourceTag": "*",
-                "onlyDependOnLibsWithTags": ["*"]
-              }
-            ]
-          }
-        ]
+        "unused-imports/no-unused-vars": "warn"
       }
     },
     {

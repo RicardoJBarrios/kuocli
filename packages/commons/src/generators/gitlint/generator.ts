@@ -4,7 +4,7 @@ import { join } from 'path';
 import { SHARED_HUSKY } from '../../shared';
 import { addScriptToWorkspace } from '../../utils/add-script-to-workspace';
 import { cleanStringArray } from '../../utils/clean-string-array';
-import { getProjectNamesByType } from '../../utils/get-project-names';
+import { getProjectNamesByType } from '../../utils/get-project-names-by-type';
 import { GitlintGeneratorSchema } from './schema';
 
 interface NormalizedSchema extends GitlintGeneratorSchema {

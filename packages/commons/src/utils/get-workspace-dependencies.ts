@@ -1,5 +1,5 @@
 import { Tree } from '@nrwl/devkit';
-import { isObject } from 'lodash';
+import isObject from 'lodash/isObject';
 
 import { cleanStringArray } from './clean-string-array';
 import { DEPENDENCY_TYPE } from './dependency-type';
@@ -7,8 +7,9 @@ import { getJsonFile } from './get-json-file';
 
 /**
  * Gets the list of library names in the workspace package.json dependencies.
+ *
  * @param tree Virtual file system tree.
- * @param filterTypes A list to filter by dependency types.
+ * @param filterTypes An optional list to filter by dependency types.
  * @returns The list of library names in the workspace package.json dependencies.
  */
 export function getWorkspaceDependencies(tree: Tree, ...filterTypes: DEPENDENCY_TYPE[]): string[] {

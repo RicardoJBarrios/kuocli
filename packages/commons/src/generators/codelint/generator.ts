@@ -1,11 +1,19 @@
-import { addDependenciesToPackageJson, formatFiles, generateFiles, installPackagesTask, Tree } from '@nrwl/devkit';
+import {
+  addDependenciesToPackageJson,
+  detectPackageManager,
+  formatFiles,
+  generateFiles,
+  installPackagesTask,
+  PackageManager,
+  Tree
+} from '@nrwl/devkit';
 import { join } from 'path';
 
 import { SHARED_HUSKY } from '../../shared';
+import { mergeWithArray } from '../../utils';
 import { addIdePluginRecommendations } from '../../utils/add-ide-plugin-recommendations';
 import { addIdeSettings } from '../../utils/add-ide-settings';
 import { addScriptToWorkspace } from '../../utils/add-script-to-workspace';
-import { getJsonFile } from '../../utils/get-json-file';
 import { getWorkspaceDependencies } from '../../utils/get-workspace-dependencies';
 import { upsertJsonFile } from '../../utils/upsert-json-file';
 import { CodelintGeneratorSchema } from './schema';
@@ -38,47 +46,40 @@ function hasEslint(tree: Tree): boolean {
 }
 
 function modifyEslintConfig(tree: Tree) {
-  const filePath = '.eslintrc.json';
-  const lintJson = getJsonFile(tree, filePath);
   const eslintConfig = {
-    files: ['*.ts', '*.tsx', '*.js', '*.jsx'],
-    plugins: ['import'],
-    rules: {
-      'import/first': 'error',
-      'import/newline-after-import': 'error',
-      'import/no-duplicates': 'error',
-      'import/order': [
-        'error',
-        {
-          groups: ['index', 'sibling', 'parent', 'internal', 'external', 'builtin', 'object', 'type']
+    overrides: [
+      {
+        files: ['*.ts', '*.tsx', '*.js', '*.jsx'],
+        plugins: ['simple-import-sort', 'unused-imports'],
+        rules: {
+          'no-unused-vars': 'off',
+          '@typescript-eslint/no-unused-vars': 'off',
+          'simple-import-sort/imports': 'error',
+          'simple-import-sort/exports': 'error',
+          'unused-imports/no-unused-imports': 'error',
+          'unused-imports/no-unused-vars': 'warn'
         }
-      ]
-    }
+      }
+    ]
   };
 
-  if (lintJson !== null && Array.isArray(lintJson.overrides)) {
-    upsertJsonFile(tree, filePath, (json) => {
-      json.overrides = [...((json.overrides ?? []) as []), eslintConfig];
-
-      return json;
-    });
-  }
+  upsertJsonFile(tree, '.eslintrc.json', (json) => {
+    return mergeWithArray(json, eslintConfig);
+  });
 }
 
-function addLintToLintStaged(tree: Tree) {
-  const filePath = '.lintstagedrc';
-  upsertJsonFile(tree, filePath, (json) => {
-    const value: unknown = json['*.{js,jsx,ts,tsx}'];
-    const safeValue: string[] = Array.isArray(value) ? value : [];
-    json['*.{js,jsx,ts,tsx}'] = [...safeValue, 'nx affected:lint --fix --files'];
+function addEslintToLintStaged(tree: Tree) {
+  const lintAffected = { '*.{js,jsx,ts,tsx}': ['nx affected:lint --fix --files'] };
 
-    return json;
+  upsertJsonFile(tree, '.lintstagedrc', (json) => {
+    return mergeWithArray(json, lintAffected);
   });
 }
 
 function addDependencies(tree: Tree) {
   const eslintDependencies = {
-    'eslint-plugin-import': '^2.27.5'
+    'eslint-plugin-simple-import-sort': '^10.0.0',
+    'eslint-plugin-unused-imports': '^2.0.0'
   };
   const devDependencies = {
     ...SHARED_HUSKY,
@@ -101,15 +102,17 @@ function preparePrettier(tree: Tree) {
 }
 
 function prepareEslint(tree: Tree) {
-  addIdePluginRecommendations(tree, 'dbaeumer.vscode-eslint');
-  addScriptToWorkspace(tree, 'lint:all', 'nx run-many --all --target=lint --fix');
-  modifyEslintConfig(tree);
-  addLintToLintStaged(tree);
-  addIdeSettings(tree, {
-    'editor.codeActionsOnSave': {
-      'source.fixAll.eslint': true
-    }
-  });
+  if (hasEslint(tree)) {
+    addIdePluginRecommendations(tree, 'dbaeumer.vscode-eslint');
+    addScriptToWorkspace(tree, 'lint:all', 'nx run-many --all --target=lint --fix');
+    modifyEslintConfig(tree);
+    addEslintToLintStaged(tree);
+    addIdeSettings(tree, {
+      'editor.codeActionsOnSave': {
+        'source.fixAll.eslint': true
+      }
+    });
+  }
 }
 
 function prepareCodemetrics(tree: Tree) {
@@ -129,9 +132,26 @@ function prepareCodemetrics(tree: Tree) {
   });
 }
 
+function prepareSonarlint(tree: Tree) {
+  addIdePluginRecommendations(tree, 'SonarSource.sonarlint-vscode');
+  addIdeSettings(tree, {
+    'sonarlint.analyzerProperties': {
+      'sonar.typescript.exclusions': '**/*.spec.ts,**/test-setup.ts'
+    }
+  });
+}
+
+function prepareEditorconfig(tree: Tree) {
+  tree.delete('.editorconfig');
+}
+
 function prepareHusky(tree: Tree) {
   tree.changePermissions('.husky/pre-commit', '755');
   addScriptToWorkspace(tree, 'prepare', 'husky install');
+}
+
+function prepareSecurityCheck(tree: Tree) {
+  const manager: PackageManager = detectPackageManager();
 }
 
 export default async function (tree: Tree, options: CodelintGeneratorSchema) {
@@ -141,11 +161,11 @@ export default async function (tree: Tree, options: CodelintGeneratorSchema) {
   addDependencies(tree);
 
   preparePrettier(tree);
-  if (hasEslint(tree)) {
-    prepareEslint(tree);
-  }
+  prepareEslint(tree);
   prepareCodemetrics(tree);
-
+  prepareSonarlint(tree);
+  prepareEditorconfig(tree);
+  prepareSecurityCheck(tree);
   prepareHusky(tree);
 
   if (!normalizedOptions.skipFormat) {

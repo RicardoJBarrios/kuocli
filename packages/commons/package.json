@@ -1,10 +1,30 @@
 {
   "name": "@kuocli/commons",
   "version": "0.0.25",
+  "description": "Generators and utilities for managing applications and libraries within an Nx workspace.",
+  "keywords": [
+    "Monorepo",
+    "CLI",
+    "nx",
+    "prettier",
+    "eslint",
+    "git"
+  ],
+  "homepage": "https://github.com/RicardoJBarrios/kuocli/blob/main/packages/commons/README.md",
+  "bugs": {
+    "url": "https://github.com/RicardoJBarrios/kuocli/labels/lib%3Acommons"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RicardoJBarrios/kuoki.git",
+    "directory": "packages/environment"
+  },
   "main": "src/index.js",
   "generators": "./generators.json",
   "executors": "./executors.json",
   "dependencies": {
+    "@nrwl/devkit": "15.7.2",
     "lodash": "^4.17.21"
   }
 }

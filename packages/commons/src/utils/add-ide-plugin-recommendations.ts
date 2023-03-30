@@ -1,5 +1,5 @@
 import { Tree } from '@nrwl/devkit';
-import { get } from 'lodash';
+import get from 'lodash/get';
 
 import { cleanStringArray } from './clean-string-array';
 import { upsertJsonFile } from './upsert-json-file';

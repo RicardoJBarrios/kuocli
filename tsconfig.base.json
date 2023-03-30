@@ -16,7 +16,8 @@
     "baseUrl": ".",
     "paths": {
       "@kuocli/commons": ["packages/commons/src/index.ts"]
-    }
+    },
+    "esModuleInterop": true
   },
   "exclude": ["node_modules", "tmp"]
 }

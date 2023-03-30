@@ -4,6 +4,7 @@ export * from './add-script-to-workspace';
 export * from './clean-string-array';
 export * from './dependency-type';
 export * from './get-json-file';
-export * from './get-project-names';
+export * from './get-project-names-by-type';
 export * from './get-workspace-dependencies';
+export * from './merge-with-array';
 export * from './upsert-json-file';

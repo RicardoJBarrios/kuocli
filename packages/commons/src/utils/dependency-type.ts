@@ -1,3 +1,6 @@
+/**
+ * The dependency type in package.json.
+ */
 export type DEPENDENCY_TYPE =
   | 'dependencies'
   | 'devDependencies'

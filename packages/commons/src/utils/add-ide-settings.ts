@@ -1,6 +1,6 @@
 import { Tree } from '@nrwl/devkit';
-import { merge } from 'lodash';
 
+import { mergeWithArray } from './merge-with-array';
 import { upsertJsonFile } from './upsert-json-file';
 
 /**
@@ -11,6 +11,6 @@ import { upsertJsonFile } from './upsert-json-file';
  */
 export function addIdeSettings(tree: Tree, settings: Record<string, unknown>): Record<string, unknown> {
   return upsertJsonFile(tree, '.vscode/settings.json', (json) => {
-    return merge(json, settings);
+    return mergeWithArray({}, json, settings);
   });
 }
