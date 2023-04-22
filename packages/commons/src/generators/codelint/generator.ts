@@ -79,21 +79,15 @@ function addEslintToLintStaged(tree: Tree) {
 }
 
 function addDependencies(tree: Tree) {
-  const eslintDependencies = {
-    'eslint-plugin-simple-import-sort': '^10.0.0',
-    'eslint-plugin-unused-imports': '^2.0.0'
-  };
   const devDependencies = {
     ...SHARED_HUSKY,
-    prettier: '~2.8.5',
-    'lint-staged': '~13.2.0',
-    ...(hasEslint(tree) ? eslintDependencies : {})
+    'lint-staged': '~13.2.0'
   };
-
   addDependenciesToPackageJson(tree, {}, devDependencies);
 }
 
 function preparePrettier(tree: Tree) {
+  addDependenciesToPackageJson(tree, {}, { prettier: '~2.8.5' });
   upsertIDEExtensionRecommendations(tree, 'esbenp.prettier-vscode');
   addScript(tree, 'format:all', 'nx format:write --all');
   upsertIDESettings(tree, {
@@ -105,6 +99,11 @@ function preparePrettier(tree: Tree) {
 
 function prepareEslint(tree: Tree) {
   if (hasEslint(tree)) {
+    const devDependencies = {
+      'eslint-plugin-simple-import-sort': '^10.0.0',
+      'eslint-plugin-unused-imports': '^2.0.0'
+    };
+    addDependenciesToPackageJson(tree, {}, devDependencies);
     upsertIDEExtensionRecommendations(tree, 'dbaeumer.vscode-eslint');
     addScript(tree, 'lint:all', 'nx run-many --all --target=lint --fix');
     modifyEslintConfig(tree);
@@ -153,7 +152,18 @@ function prepareHusky(tree: Tree) {
 }
 
 function prepareSecurityCheck(tree: Tree) {
-  const manager: PackageManager = detectPackageManager();
+  const packageManager: PackageManager = detectPackageManager();
+  const scripts = {
+    yarn: 'yarn-audit-fix --only=prod',
+    pnpm: 'pnpm audit --fix --prod',
+    npm: 'npm audit fix --omit=dev --omit=peer'
+  };
+
+  addScript(tree, 'audit:prod', scripts[packageManager]);
+  addScript(tree, 'ci:pre-commit:main', `git-branch-is main -q && ${scripts[packageManager]}`);
+  if (packageManager === 'yarn') {
+    addDependenciesToPackageJson(tree, {}, { 'yarn-audit-fix': '~9.3.10' });
+  }
 }
 
 export default async function (tree: Tree, options: CodelintGeneratorSchema) {

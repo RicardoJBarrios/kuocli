@@ -10,7 +10,8 @@ jest.mock('@nrwl/devkit', () => {
   const original = jest.requireActual('@nrwl/devkit');
   return {
     ...original,
-    formatFiles: jest.fn()
+    formatFiles: jest.fn(),
+    detectPackageManager: jest.fn()
   };
 });
 
