@@ -1,7 +1,7 @@
 import { readJson, Tree } from '@nrwl/devkit';
 import isObject from 'lodash/isObject';
 
-import { cleanStringArray } from './clean-string-array';
+import { cleanArray } from './clean-array';
 
 type DependencyType =
   | 'dependencies'
@@ -31,7 +31,7 @@ export function getDependencies(tree: Tree, ...filterTypes: DependencyType[]): s
           'optionalDependencies'
         ];
 
-  return cleanStringArray(
+  return cleanArray(
     types.reduce((keys: DependencyType[], type: DependencyType) => {
       if (isObject(json[type])) {
         return [...keys, ...Object.keys(json[type])];

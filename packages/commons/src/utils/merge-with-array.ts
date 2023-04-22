@@ -1,6 +1,6 @@
 import mergeWith from 'lodash/mergeWith';
 
-import { cleanStringArray } from './clean-string-array';
+import { cleanArray } from './clean-array';
 
 /**
  * Merges properties of source objects to the destination object concatenating Arrays without duplicates
@@ -11,7 +11,7 @@ import { cleanStringArray } from './clean-string-array';
 export function mergeWithArray<T = Record<string, unknown>>(obj: T, ...sources: object[]): T {
   const customizer = (objValue: object, srcValue: unknown) => {
     if (Array.isArray(objValue)) {
-      return cleanStringArray(objValue.concat(srcValue));
+      return cleanArray(objValue.concat(srcValue));
     }
   };
 
