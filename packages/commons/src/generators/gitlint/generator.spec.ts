@@ -28,93 +28,7 @@ describe('gitlint generator', () => {
     });
   });
 
-  describe('addFiles', () => {
-    it('creates .husky/commit-msg', async () => {
-      await generator(tree, {});
-      const file = tree.exists('.husky/commit-msg');
-      expect(file).toBeTruthy();
-    });
-
-    it('creates .husky/prepare-commit-msg', async () => {
-      await generator(tree, {});
-      const file = tree.exists('.husky/prepare-commit-msg');
-      expect(file).toBeTruthy();
-    });
-
-    it('creates .czrc', async () => {
-      await generator(tree, {});
-      const file = tree.exists('.czrc');
-      expect(file).toBeTruthy();
-    });
-
-    it('creates .commitlintrc', async () => {
-      await generator(tree, {});
-      const file = tree.exists('.commitlintrc');
-      expect(file).toBeTruthy();
-    });
-
-    it('.commitlintrc uses applications and libraries scopes by default', async () => {
-      await generator(tree, {});
-      const json = readJson(tree, '.commitlintrc');
-      expect(json['rules']['scope-enum'][2]).toEqual(['app1', 'lib1']);
-    });
-
-    it('.commitlintrc ignores applications scope if "appScopes" is false', async () => {
-      await generator(tree, { appScopes: false });
-      const json = readJson(tree, '.commitlintrc');
-      expect(json['rules']['scope-enum'][2]).toEqual(['lib1']);
-    });
-
-    it('.commitlintrc ignores libraries scope if "libScopes" is false', async () => {
-      await generator(tree, { libScopes: false });
-      const json = readJson(tree, '.commitlintrc');
-      expect(json['rules']['scope-enum'][2]).toEqual(['app1']);
-    });
-
-    it('.commitlintrc ignores applications and libraries scope if "appScopes" and "libScopes" are false', async () => {
-      await generator(tree, { appScopes: false, libScopes: false });
-      const json = readJson(tree, '.commitlintrc');
-      expect(json['rules']['scope-enum'][2]).toEqual([]);
-    });
-
-    it('.commitlintrc uses "scopes"', async () => {
-      await generator(tree, {
-        scopes: 'test1',
-        appScopes: false,
-        libScopes: false
-      });
-      const json = readJson(tree, '.commitlintrc');
-      expect(json['rules']['scope-enum'][2]).toEqual(['test1']);
-    });
-
-    it('.commitlintrc uses "scopes" from comma-separated list', async () => {
-      await generator(tree, {
-        scopes: 'test1, test2',
-        appScopes: false,
-        libScopes: false
-      });
-      const json = readJson(tree, '.commitlintrc');
-      expect(json['rules']['scope-enum'][2]).toEqual(['test1', 'test2']);
-    });
-
-    it('.commitlintrc removes spaces and emty values from scopes', async () => {
-      await generator(tree, {
-        scopes: ' test1 ,, ,',
-        appScopes: true,
-        libScopes: true
-      });
-      const json = readJson(tree, '.commitlintrc');
-      expect(json['rules']['scope-enum'][2]).toEqual(['test1', 'app1', 'lib1']);
-    });
-
-    it('.commitlintrc joins all scope sources', async () => {
-      await generator(tree, { scopes: 'test1' });
-      const json = readJson(tree, '.commitlintrc');
-      expect(json['rules']['scope-enum'][2]).toEqual(['test1', 'app1', 'lib1']);
-    });
-  });
-
-  describe('addDependencies', () => {
+  describe('prepareCommitlint', () => {
     it('adds commitlint dependencies', async () => {
       await generator(tree, {});
       const devDeps = getDependencies(tree, 'devDependencies');
@@ -128,28 +42,110 @@ describe('gitlint generator', () => {
       );
     });
 
+    it('creates .husky/commit-msg', async () => {
+      await generator(tree, {});
+      const file = tree.exists('.husky/commit-msg');
+      expect(file).toBeTruthy();
+    });
+
+    it('creates .commitlintrc.json', async () => {
+      await generator(tree, {});
+      const file = tree.exists('.commitlintrc.json');
+      expect(file).toBeTruthy();
+    });
+
+    it('.commitlintrc.json uses applications and libraries scopes by default', async () => {
+      await generator(tree, {});
+      const json = readJson(tree, '.commitlintrc.json');
+      expect(json['rules']['scope-enum'][2]).toEqual(['app1', 'lib1']);
+    });
+
+    it('.commitlintrc.json ignores applications scope if "appScopes" is false', async () => {
+      await generator(tree, { appScopes: false });
+      const json = readJson(tree, '.commitlintrc.json');
+      expect(json['rules']['scope-enum'][2]).toEqual(['lib1']);
+    });
+
+    it('.commitlintrc.json ignores libraries scope if "libScopes" is false', async () => {
+      await generator(tree, { libScopes: false });
+      const json = readJson(tree, '.commitlintrc.json');
+      expect(json['rules']['scope-enum'][2]).toEqual(['app1']);
+    });
+
+    it('.commitlintrc.json ignores applications and libraries scope if "appScopes" and "libScopes" are false', async () => {
+      await generator(tree, { appScopes: false, libScopes: false });
+      const json = readJson(tree, '.commitlintrc.json');
+      expect(json['rules']['scope-enum'][2]).toEqual([]);
+    });
+
+    it('.commitlintrc.json uses "scopes"', async () => {
+      await generator(tree, {
+        scopes: 'test1',
+        appScopes: false,
+        libScopes: false
+      });
+      const json = readJson(tree, '.commitlintrc.json');
+      expect(json['rules']['scope-enum'][2]).toEqual(['test1']);
+    });
+
+    it('.commitlintrc.json uses "scopes" from comma-separated list', async () => {
+      await generator(tree, {
+        scopes: 'test1, test2',
+        appScopes: false,
+        libScopes: false
+      });
+      const json = readJson(tree, '.commitlintrc.json');
+      expect(json['rules']['scope-enum'][2]).toEqual(['test1', 'test2']);
+    });
+
+    it('.commitlintrc.json removes spaces and emty values from scopes', async () => {
+      await generator(tree, {
+        scopes: ' test1 ,, ,',
+        appScopes: true,
+        libScopes: true
+      });
+      const json = readJson(tree, '.commitlintrc.json');
+      expect(json['rules']['scope-enum'][2]).toEqual(['test1', 'app1', 'lib1']);
+    });
+
+    it('.commitlintrc.json joins all scope sources', async () => {
+      await generator(tree, { scopes: 'test1' });
+      const json = readJson(tree, '.commitlintrc.json');
+      expect(json['rules']['scope-enum'][2]).toEqual(['test1', 'app1', 'lib1']);
+    });
+  });
+
+  describe('prepareCommitizen', () => {
     it('adds commitizen dependency', async () => {
       await generator(tree, {});
       const devDeps = getDependencies(tree, 'devDependencies');
       expect(devDeps).toEqual(expect.arrayContaining(['commitizen']));
     });
 
+    it('creates .husky/prepare-commit-msg', async () => {
+      await generator(tree, {});
+      const file = tree.exists('.husky/prepare-commit-msg');
+      expect(file).toBeTruthy();
+    });
+
+    it('creates .czrc.json', async () => {
+      await generator(tree, {});
+      const file = tree.exists('.czrc.json');
+      expect(file).toBeTruthy();
+    });
+  });
+
+  describe('prepareHusky', () => {
     it('adds husky dependency', async () => {
       await generator(tree, {});
       const devDeps = getDependencies(tree, 'devDependencies');
       expect(devDeps).toEqual(expect.arrayContaining(['husky']));
     });
-  });
 
-  describe('prepareHusky', () => {
-    it('makes husky scripts executable', async () => {
-      const spy = jest.spyOn(tree, 'changePermissions');
-      expect(spy).not.toHaveBeenCalled();
+    it('adds git-branch-is dependency', async () => {
       await generator(tree, {});
-      expect(spy).toHaveBeenCalledTimes(2);
-      expect(spy).toHaveBeenNthCalledWith(1, '.husky/commit-msg', '755');
-      expect(spy).toHaveBeenNthCalledWith(2, '.husky/prepare-commit-msg', '755');
-      spy.mockReset();
+      const devDeps = getDependencies(tree, 'devDependencies');
+      expect(devDeps).toEqual(expect.arrayContaining(['git-branch-is']));
     });
 
     it('adds husky install script', async () => {

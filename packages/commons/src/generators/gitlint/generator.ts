@@ -2,12 +2,13 @@ import { addDependenciesToPackageJson, formatFiles, generateFiles, installPackag
 import { join } from 'path';
 
 import { SHARED_HUSKY } from '../../shared';
-import { addScript, cleanStringArray, getProjectNamesByType } from '../../utils';
+import { addScript, cleanArray, getProjectNamesByType, upsertHuskyHook } from '../../utils';
 import { GitlintGeneratorSchema } from './schema';
 
 interface NormalizedSchema extends GitlintGeneratorSchema {
   workspaceRoot: string;
   parsedScopes: string[];
+  tmpl: string;
 }
 
 function normalizeOptions(tree: Tree, options: GitlintGeneratorSchema): NormalizedSchema {
@@ -18,7 +19,7 @@ function normalizeOptions(tree: Tree, options: GitlintGeneratorSchema): Normaliz
     ...options
   };
   const workspaceRoot = '/';
-  const parsedScopes = cleanStringArray([
+  const parsedScopes = cleanArray([
     ...(finalOptions.scopes ? finalOptions.scopes.split(',') : []),
     ...(finalOptions.appScopes ? getProjectNamesByType(tree, 'application') : []),
     ...(finalOptions.libScopes ? getProjectNamesByType(tree, 'library') : [])
@@ -27,43 +28,49 @@ function normalizeOptions(tree: Tree, options: GitlintGeneratorSchema): Normaliz
   return {
     ...finalOptions,
     workspaceRoot,
-    parsedScopes
+    parsedScopes,
+    tmpl: ''
   };
 }
 
-function addFiles(tree: Tree, options: NormalizedSchema) {
-  const templateOptions = {
-    ...options,
-    template: ''
-  };
-
-  generateFiles(tree, join(__dirname, 'files'), options.workspaceRoot, templateOptions);
-}
-
-function addDependencies(tree: Tree) {
+function prepareCommitlint(tree: Tree, options: NormalizedSchema) {
   const devDependencies = {
-    ...SHARED_HUSKY,
-    '@commitlint/cli': '~17.4.4',
+    '@commitlint/cli': '~17.5.1',
     '@commitlint/config-conventional': '~17.4.4',
-    '@commitlint/cz-commitlint': '~17.4.4',
-    commitizen: '~4.3.0',
-    inquirer: '~8.0.0'
+    '@commitlint/cz-commitlint': '~17.5.0',
+    // @commitlint/config-conventional peer dependency
+    inquirer: '^8.0.0'
   };
-
   addDependenciesToPackageJson(tree, {}, devDependencies);
+  upsertHuskyHook(tree, 'commit-msg', 'npx --no-install commitlint --edit $1');
+  generateFiles(tree, join(__dirname, 'files/commitlint'), options.workspaceRoot, options);
+}
+
+function prepareCommitizen(tree: Tree, options: NormalizedSchema) {
+  const devDependencies = {
+    commitizen: '~4.3.0'
+  };
+  addDependenciesToPackageJson(tree, {}, devDependencies);
+  upsertHuskyHook(
+    tree,
+    'prepare-commit-msg',
+    'COMMIT_MSG_FILE=$1\nCOMMIT_SOURCE=$2\nSHA1=$3\n',
+    'if [ "${COMMIT_SOURCE}" = merge ]; then exit 0; fi\n',
+    'exec < /dev/tty && npx --no-install cz --hook || true'
+  );
+  generateFiles(tree, join(__dirname, 'files/commitizen'), options.workspaceRoot, options);
 }
 
 function prepareHusky(tree: Tree) {
-  tree.changePermissions('.husky/commit-msg', '755');
-  tree.changePermissions('.husky/prepare-commit-msg', '755');
+  addDependenciesToPackageJson(tree, {}, SHARED_HUSKY);
   addScript(tree, 'prepare', 'husky install');
 }
 
 export default async function (tree: Tree, options: GitlintGeneratorSchema) {
   const normalizedOptions = normalizeOptions(tree, options);
 
-  addFiles(tree, normalizedOptions);
-  addDependencies(tree);
+  prepareCommitlint(tree, normalizedOptions);
+  prepareCommitizen(tree, normalizedOptions);
   prepareHusky(tree);
 
   if (!normalizedOptions.skipFormat) {
