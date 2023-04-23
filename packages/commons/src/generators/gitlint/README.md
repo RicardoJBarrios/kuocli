@@ -82,7 +82,7 @@ For example, we can create a script that test all code on push to `main`, only t
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-#.husky/pre-push
+# .husky/pre-push
 npx git-branch-is main -q && npx nx run-many --all --target=test
-npx git-branch-is codelint -q && npx nx affected:test
+npx git-branch-is develop -q && npx nx affected:test
 ```
