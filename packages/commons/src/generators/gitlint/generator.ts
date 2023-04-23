@@ -38,7 +38,7 @@ function prepareCommitlint(tree: Tree, options: NormalizedSchema) {
     '@commitlint/cli': '~17.6.1',
     '@commitlint/config-conventional': '~17.6.1',
     '@commitlint/cz-commitlint': '~17.5.0',
-    inquirer: '^8.0.0' // @commitlint/config-conventional peer dependency
+    inquirer: '8.2.5' // @commitlint/config-conventional peer dependency
   };
   addDependenciesToPackageJson(tree, {}, devDependencies);
   upsertHuskyHook(tree, 'commit-msg', 'npx --no-install commitlint --edit $1');
