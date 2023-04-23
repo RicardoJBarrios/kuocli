@@ -28,6 +28,12 @@ describe('addScript', () => {
     expect(readJson(tree, 'package.json')).toEqual(expect.objectContaining({ scripts: { a: 'a && b' } }));
   });
 
+  it(`updates the script without whole duplicated values`, () => {
+    addScript(tree, 'a', 'aa');
+    addScript(tree, 'a', 'a');
+    expect(readJson(tree, 'package.json')).toEqual(expect.objectContaining({ scripts: { a: 'aa && a' } }));
+  });
+
   it(`updates merging with other scripts`, () => {
     addScript(tree, 'a', 'a');
     addScript(tree, 'b', 'a');

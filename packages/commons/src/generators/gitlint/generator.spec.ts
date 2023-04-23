@@ -48,69 +48,69 @@ describe('gitlint generator', () => {
       expect(file).toBeTruthy();
     });
 
-    it('creates .commitlintrc.json', async () => {
+    it('creates .commitlintrc', async () => {
       await generator(tree, {});
-      const file = tree.exists('.commitlintrc.json');
+      const file = tree.exists('.commitlintrc');
       expect(file).toBeTruthy();
     });
 
-    it('.commitlintrc.json uses applications and libraries scopes by default', async () => {
+    it('.commitlintrc uses applications and libraries scopes by default', async () => {
       await generator(tree, {});
-      const json = readJson(tree, '.commitlintrc.json');
+      const json = readJson(tree, '.commitlintrc');
       expect(json['rules']['scope-enum'][2]).toEqual(['app1', 'lib1']);
     });
 
-    it('.commitlintrc.json ignores applications scope if "appScopes" is false', async () => {
+    it('.commitlintrc ignores applications scope if "appScopes" is false', async () => {
       await generator(tree, { appScopes: false });
-      const json = readJson(tree, '.commitlintrc.json');
+      const json = readJson(tree, '.commitlintrc');
       expect(json['rules']['scope-enum'][2]).toEqual(['lib1']);
     });
 
-    it('.commitlintrc.json ignores libraries scope if "libScopes" is false', async () => {
+    it('.commitlintrc ignores libraries scope if "libScopes" is false', async () => {
       await generator(tree, { libScopes: false });
-      const json = readJson(tree, '.commitlintrc.json');
+      const json = readJson(tree, '.commitlintrc');
       expect(json['rules']['scope-enum'][2]).toEqual(['app1']);
     });
 
-    it('.commitlintrc.json ignores applications and libraries scope if "appScopes" and "libScopes" are false', async () => {
+    it('.commitlintrc ignores applications and libraries scope if "appScopes" and "libScopes" are false', async () => {
       await generator(tree, { appScopes: false, libScopes: false });
-      const json = readJson(tree, '.commitlintrc.json');
+      const json = readJson(tree, '.commitlintrc');
       expect(json['rules']['scope-enum'][2]).toEqual([]);
     });
 
-    it('.commitlintrc.json uses "scopes"', async () => {
+    it('.commitlintrc uses "scopes"', async () => {
       await generator(tree, {
         scopes: 'test1',
         appScopes: false,
         libScopes: false
       });
-      const json = readJson(tree, '.commitlintrc.json');
+      const json = readJson(tree, '.commitlintrc');
       expect(json['rules']['scope-enum'][2]).toEqual(['test1']);
     });
 
-    it('.commitlintrc.json uses "scopes" from comma-separated list', async () => {
+    it('.commitlintrc uses "scopes" from comma-separated list', async () => {
       await generator(tree, {
         scopes: 'test1, test2',
         appScopes: false,
         libScopes: false
       });
-      const json = readJson(tree, '.commitlintrc.json');
+      const json = readJson(tree, '.commitlintrc');
       expect(json['rules']['scope-enum'][2]).toEqual(['test1', 'test2']);
     });
 
-    it('.commitlintrc.json removes spaces and emty values from scopes', async () => {
+    it('.commitlintrc removes spaces and emty values from scopes', async () => {
       await generator(tree, {
         scopes: ' test1 ,, ,',
         appScopes: true,
         libScopes: true
       });
-      const json = readJson(tree, '.commitlintrc.json');
+      const json = readJson(tree, '.commitlintrc');
       expect(json['rules']['scope-enum'][2]).toEqual(['test1', 'app1', 'lib1']);
     });
 
-    it('.commitlintrc.json joins all scope sources', async () => {
+    it('.commitlintrc joins all scope sources', async () => {
       await generator(tree, { scopes: 'test1' });
-      const json = readJson(tree, '.commitlintrc.json');
+      const json = readJson(tree, '.commitlintrc');
       expect(json['rules']['scope-enum'][2]).toEqual(['test1', 'app1', 'lib1']);
     });
   });
@@ -128,9 +128,9 @@ describe('gitlint generator', () => {
       expect(file).toBeTruthy();
     });
 
-    it('creates .czrc.json', async () => {
+    it('creates .czrc', async () => {
       await generator(tree, {});
-      const file = tree.exists('.czrc.json');
+      const file = tree.exists('.czrc');
       expect(file).toBeTruthy();
     });
   });

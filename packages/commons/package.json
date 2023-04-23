@@ -1,6 +1,6 @@
 {
   "name": "@kuocli/commons",
-  "version": "0.0.25",
+  "version": "0.0.1",
   "description": "Generators and utilities for managing applications and libraries within an Nx workspace.",
   "keywords": [
     "Monorepo",
@@ -17,14 +17,14 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/RicardoJBarrios/kuoki.git",
-    "directory": "packages/environment"
+    "url": "https://github.com/RicardoJBarrios/kuocli.git",
+    "directory": "packages/commons"
   },
   "main": "src/index.js",
   "generators": "./generators.json",
   "executors": "./executors.json",
   "dependencies": {
-    "@nrwl/devkit": "15.7.2",
-    "lodash": "^4.17.21"
+    "@nrwl/devkit": "15.9.2",
+    "lodash": "~4.17.21"
   }
 }

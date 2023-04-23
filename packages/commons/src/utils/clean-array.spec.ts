@@ -15,4 +15,9 @@ describe('cleanArray', () => {
     const array: string[] = ['  a  ', 'b  ', '  c'];
     expect(cleanArray(array)).toEqual(['a', 'b', 'c']);
   });
+
+  it(`doesn't remove other falsy values`, () => {
+    const array: unknown[] = [false, 0, '', null, undefined];
+    expect(cleanArray(array)).toEqual([false, 0]);
+  });
 });

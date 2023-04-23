@@ -2,9 +2,9 @@
 
 The Commons [Nx](https://nx.dev/) Plugin contains generators and utilities for managing applications and libraries within an Nx workspace.
 
-Much of my work and hobbies involves initializing and structuring frontend applications and repositories. This is a repetitive task where I always find myself reviewing past projects so I don't leave learned settings behind.
+Much of my work involves initializing and structuring frontend applications and repositories. This is a repetitive task where I always find myself reviewing past projects so I don't leave behind useful settings.
 
-This plugin is a method to automate these tasks and reduce setup times.
+This plugin is a method to automate these tasks and reduce setup times. The idea is to code them as generic as possible, so that they can be generated in practically any existing Nx repository. I also try to make them as non-destructive as possible with existing setups.
 
 ## Setting up the Commons plugin
 
@@ -35,38 +35,42 @@ None.
 
 This functions have been created to help in the creation and testing of Nx generators.
 
-### addIdePluginRecommendations
+### addScript
 
 ```ts
-function addIdePluginRecommendations(tree: Tree, ...extensions: string[]): void;
+function addScript(tree: Tree, name: string, code: string): void;
 ```
 
-Adds plugin recommendations to the IDE.
-
-### addScriptToWorkspace
+Adds a script to the `package.json` avoiding repeat code.
 
 ```ts
-function addScriptToWorkspace(tree: Tree, scriptName: string, scriptCode: string): void;
+addScript(tree, 'a', 'a'); // { scripts: { a: 'a' } }
+addScript(tree, 'a', 'a'); // { scripts: { a: 'a' } }
+addScript(tree, 'a', 'b'); // { scripts: { a: 'a && b' } }
 ```
 
-Adds a script to the workspace's package.json.
-
-If the script name exists and is not duplicated, adds the code to be executed after the current code.
-
-### cleanStringArray
+### cleanArray
 
 ```ts
-function cleanStringArray(array: string[]): string[];
+function cleanArray<T>(array: T[]): T[];
 ```
 
-Cleans values from an Array of strings.
-
-Returns the Array without duplicates, nil or empty values and value's ending and trailing white space.
-
-### DEPENDENCY_TYPE
+Cleans values from an Array.
 
 ```ts
-type DEPENDENCY_TYPE =
+cleanArray(['a ', '', null, undefined, ' a']); // ['a']
+```
+
+### getDependencies
+
+```ts
+function getDependencies(tree: Tree, ...filterTypes: DependencyType[]): string[];
+```
+
+Gets the list of package names in `package.json`.
+
+```ts
+type DependencyType =
   | 'dependencies'
   | 'devDependencies'
   | 'peerDependencies'
@@ -75,15 +79,10 @@ type DEPENDENCY_TYPE =
   | 'optionalDependencies';
 ```
 
-The dependency type in package.json.
-
-### getJsonFile
-
 ```ts
-function getJsonFile(tree: Tree, filePath: string): Record<string, unknown> | null;
+getDependencies(tree); // ['pkg', 'devPkg']
+getDependencies(tree, 'devDependencies'); // ['devPkg']
 ```
-
-Returns the parsed JSON file value or null if the file doesn't exist or is not a valid JSON file.
 
 ### getProjectNamesByType
 
@@ -91,28 +90,96 @@ Returns the parsed JSON file value or null if the file doesn't exist or is not a
 function getProjectNamesByType(tree: Tree, projectType: ProjectType): string[];
 ```
 
-Gets the list of workspace project names by type.
-
-### getWorkspaceDependencies
+Gets a list of project names by type.
 
 ```ts
-function getWorkspaceDependencies(tree: Tree, ...filterTypes: DEPENDENCY_TYPE[]): string[];
+getProjectNamesByType(tree); // ['app','lib']
+getProjectNamesByType(tree, 'application'); // ['app']
+getProjectNamesByType(tree, 'library'); // ['lib']
 ```
-
-Gets the list of library names in the workspace package.json dependencies.
 
 ### mergeWithArray
 
 ```ts
-function mergeWithArray<T extends Record<string, unknown>, K = T>(obj: T, ...sources: K[]): T | K;
+function mergeWithArray<T = Record<string, unknown>>(obj: T, ...sources: object[]): T;
 ```
 
-Merges properties, including Arrays, of source objects to the destination object.
+Deep merges properties of source objects to the destination object.
 
-### upsertIDESettings
+Returns the merged objects, concatenating Arrays without duplicates or empty values.
 
 ```ts
-function upsertIDESettings(tree: Tree, settings: Record<string, unknown>): void;
+const a = { a: [0, 1], b: { a: 0, b: 0 } };
+const b = { a: [0, 2], b: { a: 1, c: 0 } };
+mergeWithArray(a, b); // { a: [0, 1, 2], b: { a: 1, b: 0, c: 0 } }
 ```
 
-Creates or updates the IDE settings file with the new settings.
+### removeConfig
+
+```ts
+function removeConfig(tree: Tree, path: string): string | undefined;
+```
+
+Removes a config value in package.json or a config file.
+
+Returns the deleted config value.
+
+```ts
+removeConfig(tree, 'test'); // deletes .testrc; returns the content
+```
+
+### stringContains
+
+```ts
+function stringContains(str: string, subStr: string): boolean;
+```
+
+Search whole substring in a string.
+
+Returns true if the whole substring exists in the string. False otherwise.
+
+```ts
+stringContains('a', 'b'); // false
+stringContains('aa', 'a'); // false
+stringContains('a a', 'a'); // true
+```
+
+### upsertHuskyHook
+
+```ts
+function upsertHuskyHook(tree: Tree, hook: string, ...scripts: string[]): void;
+```
+
+Creates or updates a Husky hook avoiding repeat code.
+
+```ts
+upsertHuskyHook(tree, 'pre-commit', 'echo A', 'echo B', 'echo A');
+// creates or updates .husky/pre-commit
+// adds "echo A\necho B" to the hook
+```
+
+### upsertVSCodeRecommendations
+
+```ts
+function upsertVSCodeRecommendations(tree: Tree, ...extensions: string[]): void;
+```
+
+Creates or updates the VSCode extension recommendations.
+
+```ts
+upsertVSCodeRecommendations(tree, 'ext1', 'ext2');
+// { "recommendations": ["ext1","ext2"] }
+```
+
+### upsertVSCodeSettings
+
+```ts
+function upsertVSCodeSettings(tree: Tree, settings: Record<string, unknown>): void;
+```
+
+Creates or updates the VSCode settings file with the settings.
+
+```ts
+upsertVSCodeSettings(tree, { a: 0 }); // { "a": 0 }
+upsertVSCodeSettings(tree, { b: 0 }); // { "a": 0, "b": 0 }
+```

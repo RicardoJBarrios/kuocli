@@ -15,8 +15,8 @@ import {
   addScript,
   getDependencies,
   mergeWithArray,
-  upsertIDEExtensionRecommendations,
-  upsertIDESettings
+  upsertVSCodeRecommendations,
+  upsertVSCodeSettings
 } from '../../utils';
 import { CodelintGeneratorSchema } from './schema';
 
@@ -88,9 +88,9 @@ function addDependencies(tree: Tree) {
 
 function preparePrettier(tree: Tree) {
   addDependenciesToPackageJson(tree, {}, { prettier: '~2.8.5' });
-  upsertIDEExtensionRecommendations(tree, 'esbenp.prettier-vscode');
+  upsertVSCodeRecommendations(tree, 'esbenp.prettier-vscode');
   addScript(tree, 'format:all', 'nx format:write --all');
-  upsertIDESettings(tree, {
+  upsertVSCodeSettings(tree, {
     'editor.defaultFormatter': 'esbenp.prettier-vscode',
     'editor.formatOnSave': true,
     'editor.rulers': [120]
@@ -104,11 +104,11 @@ function prepareEslint(tree: Tree) {
       'eslint-plugin-unused-imports': '^2.0.0'
     };
     addDependenciesToPackageJson(tree, {}, devDependencies);
-    upsertIDEExtensionRecommendations(tree, 'dbaeumer.vscode-eslint');
+    upsertVSCodeRecommendations(tree, 'dbaeumer.vscode-eslint');
     addScript(tree, 'lint:all', 'nx run-many --all --target=lint --fix');
     modifyEslintConfig(tree);
     addEslintToLintStaged(tree);
-    upsertIDESettings(tree, {
+    upsertVSCodeSettings(tree, {
       'editor.codeActionsOnSave': {
         'source.fixAll.eslint': true
       }
@@ -117,8 +117,8 @@ function prepareEslint(tree: Tree) {
 }
 
 function prepareCodemetrics(tree: Tree) {
-  upsertIDEExtensionRecommendations(tree, 'kisstkondoros.vscode-codemetrics');
-  upsertIDESettings(tree, {
+  upsertVSCodeRecommendations(tree, 'kisstkondoros.vscode-codemetrics');
+  upsertVSCodeSettings(tree, {
     'codemetrics.basics.ComplexityLevelExtreme': 25,
     'codemetrics.basics.ComplexityLevelExtremeDescription': 'Extreme',
     'codemetrics.basics.ComplexityLevelHigh': 10,
@@ -134,8 +134,8 @@ function prepareCodemetrics(tree: Tree) {
 }
 
 function prepareSonarlint(tree: Tree) {
-  upsertIDEExtensionRecommendations(tree, 'SonarSource.sonarlint-vscode');
-  upsertIDESettings(tree, {
+  upsertVSCodeRecommendations(tree, 'SonarSource.sonarlint-vscode');
+  upsertVSCodeSettings(tree, {
     'sonarlint.analyzerProperties': {
       'sonar.typescript.exclusions': '**/*.spec.ts,**/test-setup.ts'
     }

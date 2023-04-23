@@ -12,10 +12,16 @@ type DependencyType =
   | 'optionalDependencies';
 
 /**
- * Gets the list of package names in package.json
- * @param tree File system tree
- * @param filterTypes List of package types to filter by
- * @returns The filtered list of package names in package.json
+ * Gets the list of package names in package.json.
+ * @param tree Virtual file system tree.
+ * @param filterTypes List of package types to filter by.
+ * @returns The filtered list of package names in package.json.
+ *
+ * @example
+ * ```ts
+ * getDependencies(tree); // ['pkg', 'devPkg']
+ * getDependencies(tree, 'devDependencies'); // ['devPkg']
+ * ```
  */
 export function getDependencies(tree: Tree, ...filterTypes: DependencyType[]): string[] {
   const json = readJson(tree, 'package.json');
@@ -31,12 +37,13 @@ export function getDependencies(tree: Tree, ...filterTypes: DependencyType[]): s
           'optionalDependencies'
         ];
 
-  return cleanArray(
-    types.reduce((keys: DependencyType[], type: DependencyType) => {
-      if (isObject(json[type])) {
-        return [...keys, ...Object.keys(json[type])];
-      }
-      return keys;
-    }, [])
-  );
+  const packagesInTypes: string[] = types.reduce((keys: DependencyType[], type: DependencyType) => {
+    if (isObject(json[type])) {
+      return [...keys, ...Object.keys(json[type])];
+    }
+
+    return keys;
+  }, []);
+
+  return cleanArray(packagesInTypes);
 }

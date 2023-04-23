@@ -35,11 +35,10 @@ function normalizeOptions(tree: Tree, options: GitlintGeneratorSchema): Normaliz
 
 function prepareCommitlint(tree: Tree, options: NormalizedSchema) {
   const devDependencies = {
-    '@commitlint/cli': '~17.5.1',
-    '@commitlint/config-conventional': '~17.4.4',
+    '@commitlint/cli': '~17.6.1',
+    '@commitlint/config-conventional': '~17.6.1',
     '@commitlint/cz-commitlint': '~17.5.0',
-    // @commitlint/config-conventional peer dependency
-    inquirer: '^8.0.0'
+    inquirer: '^8.0.0' // @commitlint/config-conventional peer dependency
   };
   addDependenciesToPackageJson(tree, {}, devDependencies);
   upsertHuskyHook(tree, 'commit-msg', 'npx --no-install commitlint --edit $1');
@@ -51,13 +50,12 @@ function prepareCommitizen(tree: Tree, options: NormalizedSchema) {
     commitizen: '~4.3.0'
   };
   addDependenciesToPackageJson(tree, {}, devDependencies);
-  upsertHuskyHook(
-    tree,
-    'prepare-commit-msg',
+  const huskyHookScripts = [
     'COMMIT_MSG_FILE=$1\nCOMMIT_SOURCE=$2\nSHA1=$3\n',
     'if [ "${COMMIT_SOURCE}" = merge ]; then exit 0; fi\n',
     'exec < /dev/tty && npx --no-install cz --hook || true'
-  );
+  ];
+  upsertHuskyHook(tree, 'prepare-commit-msg', ...huskyHookScripts);
   generateFiles(tree, join(__dirname, 'files/commitizen'), options.workspaceRoot, options);
 }
 
