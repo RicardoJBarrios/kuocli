@@ -69,3 +69,20 @@ Skip formatting files.
 ```bash
 nx generate @kuocli/commons:gitlint --skipFormat true
 ```
+
+## Use cases
+
+### git-branch-is
+
+The [git-branch-is](https://github.com/kevinoid/git-branch-is) package is installed by default to help create Husky hooks that run only on certain branches.
+
+For example, we can create a script that test all code on push to `main`, only the affected code on push to `develop` and nothing on push to other branches. In the [documentation](https://github.com/kevinoid/git-branch-is/blob/main/README.md) you can get all the available commands and options.
+
+```sh
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+#.husky/pre-push
+npx git-branch-is main -q && npx nx run-many --all --target=test
+npx git-branch-is codelint -q && npx nx affected:test
+```
