@@ -1,6 +1,6 @@
 # How to contribute
 
-In order to better manage all the contributions it is important that, when creating a new issue or discussion, the project name label is added (as well any other required) and to follow the [Code of Conduct](https://github.com/RicardoJBarrios/kuoki/blob/dca1a8b10dec511585324873e52377a347454d54/CODE_OF_CONDUCT.md).
+In order to better manage all the contributions it is important that, when creating a new issue or discussion, the project name label is added (as well any other required) and to follow the [Code of Conduct](https://github.com/RicardoJBarrios/kuocli/blob/CODE_OF_CONDUCT.md).
 
 - :bug: If you want to track or report an issue in the code or documentation use the [Issues](https://github.com/RicardoJBarrios/kuocli/issues).
 - :bulb: If you want to track or discuss new features or share new ideas use the [Environment Ideas](https://github.com/RicardoJBarrios/kuocli/discussions/categories/ideas) discussion forum.
