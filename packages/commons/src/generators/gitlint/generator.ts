@@ -85,7 +85,7 @@ function prepareGit(tree: Tree) {
 
 function prepareGitflow() {
   execSync('git add .');
-  execSync('git commit -m "Initial commit" --no-verify');
+  execSync('HUSKY=0 git commit -m "Initial commit"');
   execSync('git flow init -d');
   execSync('git config "gitflow.path.hooks" .husky');
 }
