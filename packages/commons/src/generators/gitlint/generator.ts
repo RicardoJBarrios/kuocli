@@ -84,23 +84,31 @@ function prepareGit(tree: Tree) {
 }
 
 function prepareGitflow() {
-  execSync('git add .');
-  execSync('HUSKY=0 git commit -m "Initial commit" --no-verify');
+  // execSync('git add .');
+  // execSync('HUSKY=0 git commit -m "Initial commit" --no-verify');
+
+  execSync('git add -A', { encoding: 'utf8', stdio: 'pipe' });
+  execSync('git commit --no-verify -F -', {
+    encoding: 'utf8',
+    stdio: 'pipe',
+    input: 'Initial commit'
+  });
+
   execSync('git flow init -d');
   execSync('git config "gitflow.path.hooks" .husky');
 }
 
-async function initialize(tree: Tree, options: GitlintGeneratorSchema) {
+export default async function (tree: Tree, options: GitlintGeneratorSchema) {
   const normalizedOptions = normalizeOptions(tree, options);
+
+  if (normalizedOptions.gitflow) {
+    prepareGitflow();
+  }
 
   prepareCommitlint(tree, normalizedOptions);
   prepareCommitizen(tree, normalizedOptions);
   prepareHusky(tree);
   prepareGit(tree);
-
-  if (normalizedOptions.gitflow) {
-    prepareGitflow();
-  }
 
   if (!normalizedOptions.skipFormat) {
     await formatFiles(tree);
@@ -109,11 +117,4 @@ async function initialize(tree: Tree, options: GitlintGeneratorSchema) {
   return () => {
     installPackagesTask(tree);
   };
-}
-
-export default async function (tree: Tree, options: GitlintGeneratorSchema) {
-  return initialize(tree, options).then(() => {
-    prepareGitflow();
-    return Promise.resolve(() => null);
-  });
 }
