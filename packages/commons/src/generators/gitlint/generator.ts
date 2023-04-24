@@ -90,7 +90,7 @@ function prepareGitflow() {
   execSync('git config "gitflow.path.hooks" .husky');
 }
 
-export default async function (tree: Tree, options: GitlintGeneratorSchema) {
+async function initialize(tree: Tree, options: GitlintGeneratorSchema) {
   const normalizedOptions = normalizeOptions(tree, options);
 
   prepareCommitlint(tree, normalizedOptions);
@@ -109,4 +109,11 @@ export default async function (tree: Tree, options: GitlintGeneratorSchema) {
   return () => {
     installPackagesTask(tree);
   };
+}
+
+export default async function (tree: Tree, options: GitlintGeneratorSchema) {
+  return initialize(tree, options).then(() => {
+    prepareGitflow();
+    return Promise.resolve(() => null);
+  });
 }
