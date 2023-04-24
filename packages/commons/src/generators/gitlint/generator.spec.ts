@@ -157,6 +157,14 @@ describe('gitlint generator', () => {
     });
   });
 
+  describe('prepareGit', () => {
+    it('adds GitLens plugin to IDE', async () => {
+      await generator(tree, {});
+      const json = readJson(tree, '.vscode/extensions.json');
+      expect(json.recommendations).toEqual(expect.arrayContaining(['eamodio.gitlens']));
+    });
+  });
+
   describe('skipFormat', () => {
     let spy: jest.SpyInstance<Promise<void>, [tree: Tree]>;
 
