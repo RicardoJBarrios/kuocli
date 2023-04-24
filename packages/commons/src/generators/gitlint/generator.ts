@@ -67,10 +67,8 @@ function prepareHusky(tree: Tree) {
 }
 
 function prepareGitflow(options: NormalizedSchema) {
-  if (options.gitflow) {
-    execSync('git flow init -d');
-    execSync('git config "gitflow.path.hooks" .husky');
-  }
+  execSync('git flow init -d');
+  execSync('git config "gitflow.path.hooks" .husky');
 }
 
 export default async function (tree: Tree, options: GitlintGeneratorSchema) {
@@ -79,7 +77,10 @@ export default async function (tree: Tree, options: GitlintGeneratorSchema) {
   prepareCommitlint(tree, normalizedOptions);
   prepareCommitizen(tree, normalizedOptions);
   prepareHusky(tree);
-  prepareGitflow(normalizedOptions);
+
+  if (normalizedOptions.gitflow) {
+    prepareGitflow(normalizedOptions);
+  }
 
   if (!normalizedOptions.skipFormat) {
     await formatFiles(tree);
