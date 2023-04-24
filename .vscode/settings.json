@@ -2,7 +2,7 @@
   "editor.bracketPairColorization.enabled": true,
   "editor.guides.bracketPairs": "active",
 
-  //
+  // eamodio.gitlens
   "gitlens.graph.statusBar.enabled": false,
   "gitlens.plusFeatures.enabled": false,
   "gitlens.showWelcomeOnInstall": false,
