@@ -69,7 +69,7 @@ function prepareHusky(tree: Tree) {
 function prepareGitflow(options: NormalizedSchema) {
   if (options.gitflow) {
     execSync('git flow init -d');
-    // execSync('git config "gitflow.path.hooks" .husky');
+    execSync('git config "gitflow.path.hooks" .husky');
   }
 }
 
