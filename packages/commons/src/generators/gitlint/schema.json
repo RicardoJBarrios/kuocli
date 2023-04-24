@@ -6,6 +6,12 @@
   "description": "Adhere the workspace to a git commit convention.",
   "type": "object",
   "properties": {
+    "gitflow": {
+      "type": "boolean",
+      "default": true,
+      "description": "Configure gitflow in the project.",
+      "x-priority": "important"
+    },
     "appScopes": {
       "type": "boolean",
       "default": true,

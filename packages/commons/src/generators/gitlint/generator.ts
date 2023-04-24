@@ -1,4 +1,5 @@
 import { addDependenciesToPackageJson, formatFiles, generateFiles, installPackagesTask, Tree } from '@nrwl/devkit';
+import { execSync } from 'child_process';
 import { join } from 'path';
 
 import { SHARED_HUSKY } from '../../shared';
@@ -13,6 +14,7 @@ interface NormalizedSchema extends GitlintGeneratorSchema {
 
 function normalizeOptions(tree: Tree, options: GitlintGeneratorSchema): NormalizedSchema {
   const finalOptions = {
+    gitflow: true,
     appScopes: true,
     libScopes: true,
     skipFormat: false,
@@ -64,12 +66,20 @@ function prepareHusky(tree: Tree) {
   addScript(tree, 'prepare', 'husky install');
 }
 
+function prepareGitflow(options: NormalizedSchema) {
+  if (options.gitflow) {
+    execSync('git flow init -d');
+    // execSync('git config "gitflow.path.hooks" .husky');
+  }
+}
+
 export default async function (tree: Tree, options: GitlintGeneratorSchema) {
   const normalizedOptions = normalizeOptions(tree, options);
 
   prepareCommitlint(tree, normalizedOptions);
   prepareCommitizen(tree, normalizedOptions);
   prepareHusky(tree);
+  prepareGitflow(normalizedOptions);
 
   if (!normalizedOptions.skipFormat) {
     await formatFiles(tree);
