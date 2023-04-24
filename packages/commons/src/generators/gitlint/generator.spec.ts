@@ -163,6 +163,12 @@ describe('gitlint generator', () => {
       const json = readJson(tree, '.vscode/extensions.json');
       expect(json.recommendations).toEqual(expect.arrayContaining(['eamodio.gitlens']));
     });
+
+    it('adds Git Graph plugin to IDE', async () => {
+      await generator(tree, {});
+      const json = readJson(tree, '.vscode/extensions.json');
+      expect(json.recommendations).toEqual(expect.arrayContaining(['mhutchie.git-graph']));
+    });
   });
 
   describe('skipFormat', () => {
