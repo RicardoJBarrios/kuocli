@@ -88,7 +88,7 @@ function prepareGitflow() {
   // execSync('HUSKY=0 git commit -m "Initial commit" --no-verify');
 
   execSync('git add -A', { encoding: 'utf8', stdio: 'pipe' });
-  execSync('git commit --no-verify -F -', {
+  execSync('HUSKY=0 git commit --no-verify -F -', {
     encoding: 'utf8',
     stdio: 'pipe',
     input: 'Initial commit'
