@@ -3,7 +3,14 @@ import { execSync } from 'child_process';
 import { join } from 'path';
 
 import { SHARED_HUSKY } from '../../shared';
-import { addScript, cleanArray, getProjectNamesByType, upsertHuskyHook } from '../../utils';
+import {
+  addScript,
+  cleanArray,
+  getProjectNamesByType,
+  upsertHuskyHook,
+  upsertVSCodeRecommendations,
+  upsertVSCodeSettings
+} from '../../utils';
 import { GitlintGeneratorSchema } from './schema';
 
 interface NormalizedSchema extends GitlintGeneratorSchema {
@@ -66,7 +73,17 @@ function prepareHusky(tree: Tree) {
   addScript(tree, 'prepare', 'husky install');
 }
 
-function prepareGitflow(options: NormalizedSchema) {
+function prepareGit(tree: Tree) {
+  upsertVSCodeRecommendations(tree, 'mhutchie.git-graph', 'eamodio.gitlens');
+  const configs = {
+    'gitlens.graph.statusBar.enabled': false,
+    'gitlens.plusFeatures.enabled': false,
+    'gitlens.showWelcomeOnInstall': false
+  };
+  upsertVSCodeSettings(tree, configs);
+}
+
+function prepareGitflow() {
   execSync('git flow init -d');
   execSync('git config "gitflow.path.hooks" .husky');
 }
@@ -77,9 +94,10 @@ export default async function (tree: Tree, options: GitlintGeneratorSchema) {
   prepareCommitlint(tree, normalizedOptions);
   prepareCommitizen(tree, normalizedOptions);
   prepareHusky(tree);
+  prepareGit(tree);
 
   if (normalizedOptions.gitflow) {
-    prepareGitflow(normalizedOptions);
+    prepareGitflow();
   }
 
   if (!normalizedOptions.skipFormat) {

@@ -2,7 +2,9 @@
 
 > Adhere the workspace to a git commit convention.
 
-This generator adds and configures [commitlint](https://commitlint.js.org/), [husky](https://typicode.github.io/husky/#/) and [commitizen](http://commitizen.github.io/cz-cli/) in the workspace to force the use of [conventional commits](https://www.conventionalcommits.org/) on git commits.
+This generator adds and configures [commitlint](https://commitlint.js.org/), [husky](https://typicode.github.io/husky/#/) and [commitizen](http://commitizen.github.io/cz-cli/) in the workspace to force the use of [conventional commits](https://www.conventionalcommits.org/) on git commits. It also configures the repository to use [gitf-low](https://github.com/nvie/gitflow) as git's branching model.
+
+> :warning: If you want to use gitflow it is necessary to install it first. [Installation instructions](https://github.com/nvie/gitflow/wiki/Installation) for all operating systems can be found in their repository.
 
 Running `git commit` displays a prompt that guides the user to complete a git commit containing all the needed items configured in the linter, and uses `husky` to ensure that those rules are followed.
 
@@ -26,6 +28,17 @@ nx generate @kuocli/commons:gitlint --dry-run
 ```
 
 ## Options
+
+### gitflow
+
+- Type: boolean
+- Default: true
+
+Configure gitflow in the project.
+
+```bash
+nx generate @kuocli/commons:gitlint --gitflow false
+```
 
 ### appScopes
 

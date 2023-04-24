@@ -2,6 +2,11 @@
   "editor.bracketPairColorization.enabled": true,
   "editor.guides.bracketPairs": "active",
 
+  //
+  "gitlens.graph.statusBar.enabled": false,
+  "gitlens.plusFeatures.enabled": false,
+  "gitlens.showWelcomeOnInstall": false,
+
   // esbenp.prettier-vscode
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
