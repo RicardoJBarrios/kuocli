@@ -1,4 +1,11 @@
-import { addDependenciesToPackageJson, formatFiles, generateFiles, installPackagesTask, Tree } from '@nrwl/devkit';
+import {
+  addDependenciesToPackageJson,
+  formatFiles,
+  generateFiles,
+  installPackagesTask,
+  logger,
+  Tree
+} from '@nrwl/devkit';
 import { execSync } from 'child_process';
 import { join } from 'path';
 
@@ -84,31 +91,36 @@ function prepareGit(tree: Tree) {
 }
 
 function prepareGitflow() {
-  // execSync('git add .');
-  // execSync('HUSKY=0 git commit -m "Initial commit" --no-verify');
-
-  execSync('git add -A', { encoding: 'utf8', stdio: 'pipe' });
-  execSync('HUSKY=0 git commit --no-verify -F -', {
-    encoding: 'utf8',
-    stdio: 'pipe',
-    input: 'Initial commit'
-  });
-
-  execSync('git flow init -d');
-  execSync('git config "gitflow.path.hooks" .husky');
+  if (process.env.NX_DRY_RUN !== 'true') {
+    try {
+      execSync('git flow version');
+      const master = execSync('git config "gitflow.branch.master" || 2>/dev/null').toString();
+      if (!master) {
+        execSync('git stash');
+        execSync('git flow init -d');
+        execSync('git config "gitflow.path.hooks" .husky');
+        execSync('git stash pop');
+        logger.info('INFO' + ' Gitflow initialized');
+      } else {
+        logger.info('INFO' + ' Gitflow is already initialized');
+      }
+    } catch {
+      logger.error('NX Please intall Gitflow');
+    }
+  }
 }
 
 export default async function (tree: Tree, options: GitlintGeneratorSchema) {
   const normalizedOptions = normalizeOptions(tree, options);
 
-  if (normalizedOptions.gitflow) {
-    prepareGitflow();
-  }
-
   prepareCommitlint(tree, normalizedOptions);
   prepareCommitizen(tree, normalizedOptions);
   prepareHusky(tree);
   prepareGit(tree);
+
+  if (normalizedOptions.gitflow) {
+    prepareGitflow();
+  }
 
   if (!normalizedOptions.skipFormat) {
     await formatFiles(tree);

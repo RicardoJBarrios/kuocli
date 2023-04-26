@@ -1,3 +1,5 @@
+import { escapeRegExp } from 'lodash';
+
 /**
  * Search whole substring in a string.
  * @param str String to search in.
@@ -12,5 +14,6 @@
  * ```
  */
 export function stringContains(str: string, subStr: string): boolean {
-  return RegExp(`\\b${subStr}\\b`).test(str);
+  const hasSpecialCharacters = escapeRegExp(subStr) !== subStr;
+  return hasSpecialCharacters ? str.includes(subStr) : RegExp(`\\b${subStr}\\b`).test(str);
 }

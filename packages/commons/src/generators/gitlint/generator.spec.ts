@@ -1,6 +1,7 @@
 import { addProjectConfiguration, readJson, Tree } from '@nrwl/devkit';
 import * as DevKit from '@nrwl/devkit';
 import { createTreeWithEmptyWorkspace } from '@nrwl/devkit/testing';
+import * as ChildProcess from 'child_process';
 
 import { getDependencies } from '../../utils';
 import generator from './generator';
@@ -13,8 +14,20 @@ jest.mock('@nrwl/devkit', () => {
   };
 });
 
+jest.mock('child_process', () => {
+  const original = jest.requireActual('child_process');
+  return {
+    ...original,
+    execSync: jest.fn()
+  };
+});
+
 describe('gitlint generator', () => {
   let tree: Tree;
+  let spyFormatFiles: jest.SpyInstance<Promise<void>>;
+  let spyExecSync: jest.SpyInstance<string | Buffer>;
+  let spyLoggerInfo: jest.SpyInstance<unknown>;
+  let spyLoggerError: jest.SpyInstance<unknown>;
 
   beforeEach(() => {
     tree = createTreeWithEmptyWorkspace({ layout: 'apps-libs' });
@@ -26,6 +39,22 @@ describe('gitlint generator', () => {
       projectType: 'library',
       root: 'libs/lib1'
     });
+  });
+
+  beforeEach(() => {
+    spyExecSync = jest.spyOn(ChildProcess, 'execSync');
+    spyLoggerInfo = jest.spyOn(DevKit.logger, 'info').mockImplementation(() => null);
+    spyLoggerError = jest.spyOn(DevKit.logger, 'error').mockImplementation(() => null);
+    spyFormatFiles = jest.spyOn(DevKit, 'formatFiles');
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+    jest.resetAllMocks();
+    spyExecSync.mockReset();
+    spyLoggerInfo.mockReset();
+    spyLoggerError.mockReset();
+    spyFormatFiles.mockReset();
   });
 
   describe('prepareCommitlint', () => {
@@ -164,6 +193,17 @@ describe('gitlint generator', () => {
       expect(json.recommendations).toEqual(expect.arrayContaining(['eamodio.gitlens']));
     });
 
+    it(`adds GitLens IDE settings`, async () => {
+      const settings = {
+        'gitlens.graph.statusBar.enabled': false,
+        'gitlens.plusFeatures.enabled': false,
+        'gitlens.showWelcomeOnInstall': false
+      };
+      await generator(tree, {});
+      const json = readJson(tree, '.vscode/settings.json');
+      expect(json).toEqual(expect.objectContaining(settings));
+    });
+
     it('adds Git Graph plugin to IDE', async () => {
       await generator(tree, {});
       const json = readJson(tree, '.vscode/extensions.json');
@@ -171,38 +211,69 @@ describe('gitlint generator', () => {
     });
   });
 
-  describe('skipFormat', () => {
-    let spy: jest.SpyInstance<Promise<void>, [tree: Tree]>;
+  describe('prepareGitflow', () => {
+    it(`do nothing if NX_DRY_RUN`, async () => {
+      process.env.NX_DRY_RUN = 'true';
+      spyExecSync.mockReturnValue('');
 
-    beforeAll(() => {
-      jest.resetAllMocks();
-    });
-
-    beforeEach(() => {
-      spy = jest.spyOn(DevKit, 'formatFiles');
-    });
-
-    afterEach(() => {
-      jest.resetAllMocks();
-      spy.mockReset();
-    });
-
-    it('format files if no "skipFormat"', async () => {
-      expect(spy).not.toHaveBeenCalled();
+      expect(spyLoggerInfo).not.toHaveBeenCalled();
       await generator(tree, {});
-      expect(spy).toHaveBeenCalledTimes(1);
+      expect(spyLoggerInfo).not.toHaveBeenCalled();
+      process.env.NX_DRY_RUN = '';
+    });
+
+    it(`logs error if no Gitflow installed`, async () => {
+      spyExecSync.mockImplementationOnce(() => {
+        throw new Error();
+      });
+
+      expect(spyLoggerError).not.toHaveBeenCalled();
+      await generator(tree, {});
+      expect(spyLoggerError).toHaveBeenNthCalledWith(1, 'NX Please intall Gitflow');
+    });
+
+    it(`doesn't log error if Gitflow installed`, async () => {
+      spyExecSync.mockReturnValueOnce('').mockReturnValueOnce('main').mockReturnValue('');
+
+      expect(spyLoggerError).not.toHaveBeenCalled();
+      await generator(tree, {});
+      expect(spyLoggerError).not.toHaveBeenCalled();
+    });
+
+    it(`logs info if Gitflow is already initialized`, async () => {
+      spyExecSync.mockReturnValueOnce('').mockReturnValueOnce('main').mockReturnValue('');
+
+      expect(spyLoggerInfo).not.toHaveBeenCalled();
+      await generator(tree, {});
+      expect(spyLoggerInfo).toHaveBeenNthCalledWith(1, 'INFO Gitflow is already initialized');
+    });
+
+    it(`logs info if Gitflow initialized`, async () => {
+      spyExecSync.mockReturnValue('');
+
+      expect(spyLoggerInfo).not.toHaveBeenCalled();
+      await generator(tree, {});
+      expect(spyLoggerInfo).toHaveBeenNthCalledWith(1, 'INFO Gitflow initialized');
+    });
+  });
+
+  describe('skipFormat', () => {
+    it('format files if no "skipFormat"', async () => {
+      expect(spyFormatFiles).not.toHaveBeenCalled();
+      await generator(tree, {});
+      expect(spyFormatFiles).toHaveBeenCalledTimes(1);
     });
 
     it('format files if "skipFormat" false', async () => {
-      expect(spy).not.toHaveBeenCalled();
+      expect(spyFormatFiles).not.toHaveBeenCalled();
       await generator(tree, { skipFormat: false });
-      expect(spy).toHaveBeenCalledTimes(1);
+      expect(spyFormatFiles).toHaveBeenCalledTimes(1);
     });
 
     it('dont format files if "skipFormat" true', async () => {
-      expect(spy).not.toHaveBeenCalled();
+      expect(spyFormatFiles).not.toHaveBeenCalled();
       await generator(tree, { skipFormat: true });
-      expect(spy).not.toHaveBeenCalled();
+      expect(spyFormatFiles).not.toHaveBeenCalled();
     });
   });
 });
