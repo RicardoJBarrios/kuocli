@@ -42,7 +42,7 @@ describe('gitlint generator', () => {
   });
 
   beforeEach(() => {
-    spyExecSync = jest.spyOn(ChildProcess, 'execSync');
+    spyExecSync = jest.spyOn(ChildProcess, 'execSync').mockReturnValue('');
     spyLoggerInfo = jest.spyOn(DevKit.logger, 'info').mockImplementation(() => null);
     spyLoggerError = jest.spyOn(DevKit.logger, 'error').mockImplementation(() => null);
     spyFormatFiles = jest.spyOn(DevKit, 'formatFiles');
@@ -227,17 +227,7 @@ describe('gitlint generator', () => {
         throw new Error();
       });
 
-      expect(spyLoggerError).not.toHaveBeenCalled();
-      await generator(tree, {});
-      expect(spyLoggerError).toHaveBeenNthCalledWith(1, 'NX Please intall Gitflow');
-    });
-
-    it(`doesn't log error if Gitflow installed`, async () => {
-      spyExecSync.mockReturnValueOnce('').mockReturnValueOnce('main').mockReturnValue('');
-
-      expect(spyLoggerError).not.toHaveBeenCalled();
-      await generator(tree, {});
-      expect(spyLoggerError).not.toHaveBeenCalled();
+      expect(() => generator(tree, {})).rejects.toBeTruthy();
     });
 
     it(`logs info if Gitflow is already initialized`, async () => {

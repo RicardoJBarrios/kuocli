@@ -2,8 +2,9 @@ import {
   addDependenciesToPackageJson,
   formatFiles,
   generateFiles,
-  installPackagesTask,
+  GeneratorCallback,
   logger,
+  runTasksInSerial,
   Tree
 } from '@nrwl/devkit';
 import { execSync } from 'child_process';
@@ -50,22 +51,18 @@ function normalizeOptions(tree: Tree, options: GitlintGeneratorSchema): Normaliz
 }
 
 function prepareCommitlint(tree: Tree, options: NormalizedSchema) {
+  upsertHuskyHook(tree, 'commit-msg', 'npx --no-install commitlint --edit $1');
+  generateFiles(tree, join(__dirname, 'files/commitlint'), options.workspaceRoot, options);
   const devDependencies = {
     '@commitlint/cli': '~17.6.1',
     '@commitlint/config-conventional': '~17.6.1',
     '@commitlint/cz-commitlint': '~17.5.0',
     inquirer: '8.2.5' // @commitlint/config-conventional peer dependency
   };
-  addDependenciesToPackageJson(tree, {}, devDependencies);
-  upsertHuskyHook(tree, 'commit-msg', 'npx --no-install commitlint --edit $1');
-  generateFiles(tree, join(__dirname, 'files/commitlint'), options.workspaceRoot, options);
+  return addDependenciesToPackageJson(tree, {}, devDependencies);
 }
 
 function prepareCommitizen(tree: Tree, options: NormalizedSchema) {
-  const devDependencies = {
-    commitizen: '~4.3.0'
-  };
-  addDependenciesToPackageJson(tree, {}, devDependencies);
   const huskyHookScripts = [
     'COMMIT_MSG_FILE=$1\nCOMMIT_SOURCE=$2\nSHA1=$3\n',
     'if [ "${COMMIT_SOURCE}" = merge ]; then exit 0; fi\n',
@@ -73,11 +70,15 @@ function prepareCommitizen(tree: Tree, options: NormalizedSchema) {
   ];
   upsertHuskyHook(tree, 'prepare-commit-msg', ...huskyHookScripts);
   generateFiles(tree, join(__dirname, 'files/commitizen'), options.workspaceRoot, options);
+  const devDependencies = {
+    commitizen: '~4.3.0'
+  };
+  return addDependenciesToPackageJson(tree, {}, devDependencies);
 }
 
 function prepareHusky(tree: Tree) {
-  addDependenciesToPackageJson(tree, {}, SHARED_HUSKY);
   addScript(tree, 'prepare', 'husky install');
+  return addDependenciesToPackageJson(tree, {}, SHARED_HUSKY);
 }
 
 function prepareGit(tree: Tree) {
@@ -92,30 +93,27 @@ function prepareGit(tree: Tree) {
 
 function prepareGitflow() {
   if (process.env.NX_DRY_RUN !== 'true') {
-    try {
-      execSync('git flow version');
-      const master = execSync('git config "gitflow.branch.master" || 2>/dev/null').toString();
-      if (!master) {
-        execSync('git stash');
-        execSync('git flow init -d');
-        execSync('git config "gitflow.path.hooks" .husky');
-        execSync('git stash pop');
-        logger.info('INFO' + ' Gitflow initialized');
-      } else {
-        logger.info('INFO' + ' Gitflow is already initialized');
-      }
-    } catch {
-      logger.error('NX Please intall Gitflow');
+    execSync('git flow version');
+    const master = execSync('git config "gitflow.branch.master" || 2>/dev/null').toString();
+    if (!master) {
+      execSync('git stash');
+      execSync('git flow init -d');
+      execSync('git config "gitflow.path.hooks" .husky');
+      execSync('git stash pop');
+      logger.info('INFO' + ' Gitflow initialized');
+    } else {
+      logger.info('INFO' + ' Gitflow is already initialized');
     }
   }
 }
 
 export default async function (tree: Tree, options: GitlintGeneratorSchema) {
   const normalizedOptions = normalizeOptions(tree, options);
+  const tasks: GeneratorCallback[] = [];
 
-  prepareCommitlint(tree, normalizedOptions);
-  prepareCommitizen(tree, normalizedOptions);
-  prepareHusky(tree);
+  tasks.push(prepareCommitlint(tree, normalizedOptions));
+  tasks.push(prepareCommitizen(tree, normalizedOptions));
+  tasks.push(prepareHusky(tree));
   prepareGit(tree);
 
   if (normalizedOptions.gitflow) {
@@ -126,7 +124,5 @@ export default async function (tree: Tree, options: GitlintGeneratorSchema) {
     await formatFiles(tree);
   }
 
-  return () => {
-    installPackagesTask(tree);
-  };
+  return runTasksInSerial(...tasks);
 }
