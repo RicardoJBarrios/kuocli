@@ -8,8 +8,9 @@
     "gitflow": {
       "type": "boolean",
       "default": true,
-      "description": "Configure gitflow in the project.",
-      "x-priority": "important"
+      "description": "Configure git-flow in the project.",
+      "x-priority": "important",
+      "x-prompt": "Make sure git-flow is installed on the system!"
     },
     "appScopes": {
       "type": "boolean",
