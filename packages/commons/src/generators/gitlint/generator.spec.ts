@@ -1,13 +1,13 @@
-import { addProjectConfiguration, readJson, Tree } from '@nrwl/devkit';
-import * as DevKit from '@nrwl/devkit';
-import { createTreeWithEmptyWorkspace } from '@nrwl/devkit/testing';
+import { addProjectConfiguration, readJson, Tree } from '@nx/devkit';
+import * as DevKit from '@nx/devkit';
+import { createTreeWithEmptyWorkspace } from '@nx/devkit/testing';
 import * as ChildProcess from 'child_process';
 
 import { getDependencies } from '../../utils';
 import generator from './generator';
 
-jest.mock('@nrwl/devkit', () => {
-  const original = jest.requireActual('@nrwl/devkit');
+jest.mock('@nx/devkit', () => {
+  const original = jest.requireActual('@nx/devkit');
   return {
     ...original,
     formatFiles: jest.fn()

@@ -24,7 +24,7 @@
   "generators": "./generators.json",
   "executors": "./executors.json",
   "dependencies": {
-    "@nrwl/devkit": "15.9.2",
-    "lodash": "~4.17.21"
+    "lodash": "~4.17.21",
+    "@nx/devkit": "16.0.1"
   }
 }

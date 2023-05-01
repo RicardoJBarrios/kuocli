@@ -1,4 +1,4 @@
-import { readJson, Tree, updateJson } from '@nrwl/devkit';
+import { readJson, Tree, updateJson } from '@nx/devkit';
 import get from 'lodash/get';
 import set from 'lodash/set';
 

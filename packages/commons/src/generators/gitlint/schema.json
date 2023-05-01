@@ -1,6 +1,5 @@
 {
   "$schema": "http://json-schema.org/schema",
-  "cli": "nx",
   "$id": "Gitlint",
   "title": "Gitlint Schema",
   "description": "Adhere the workspace to a git commit convention.",
@@ -15,14 +14,12 @@
     "appScopes": {
       "type": "boolean",
       "default": true,
-      "description": "Add existing applications as commit scopes.",
-      "x-priority": "important"
+      "description": "Add existing applications as commit scopes."
     },
     "libScopes": {
       "type": "boolean",
       "default": true,
-      "description": "Add existing libraries as commit scopes.",
-      "x-priority": "important"
+      "description": "Add existing libraries as commit scopes."
     },
     "scopes": {
       "type": "string",

@@ -3,9 +3,10 @@
   "npmScope": "kuocli",
   "tasksRunnerOptions": {
     "default": {
-      "runner": "nx/tasks-runners/default",
+      "runner": "nx-cloud",
       "options": {
-        "cacheableOperations": ["build", "lint", "test", "e2e"]
+        "cacheableOperations": ["build", "lint", "test", "e2e"],
+        "accessToken": "ZjM2YWEzMmQtNzZiMS00ZTM0LTlmZjYtNzliYTAxYmQ4MWU2fHJlYWQtd3JpdGU="
       }
     }
   },

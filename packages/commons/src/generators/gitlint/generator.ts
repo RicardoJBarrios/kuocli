@@ -6,7 +6,7 @@ import {
   logger,
   runTasksInSerial,
   Tree
-} from '@nrwl/devkit';
+} from '@nx/devkit';
 import { execSync } from 'child_process';
 import { join } from 'path';
 

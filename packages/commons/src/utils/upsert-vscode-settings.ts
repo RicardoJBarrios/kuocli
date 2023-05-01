@@ -1,4 +1,4 @@
-import { Tree, updateJson, writeJson } from '@nrwl/devkit';
+import { Tree, updateJson, writeJson } from '@nx/devkit';
 
 import { mergeWithArray } from './merge-with-array';
 

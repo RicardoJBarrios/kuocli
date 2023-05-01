@@ -1,4 +1,4 @@
-import { getProjects, ProjectType, Tree } from '@nrwl/devkit';
+import { getProjects, ProjectType, Tree } from '@nx/devkit';
 
 /**
  * Gets a list of project names by type.

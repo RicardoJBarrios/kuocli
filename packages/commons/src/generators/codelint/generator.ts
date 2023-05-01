@@ -7,7 +7,7 @@ import {
   PackageManager,
   Tree,
   updateJson
-} from '@nrwl/devkit';
+} from '@nx/devkit';
 import { join } from 'path';
 
 import { SHARED_HUSKY } from '../../shared';

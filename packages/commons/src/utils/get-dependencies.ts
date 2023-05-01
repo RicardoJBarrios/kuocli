@@ -1,4 +1,4 @@
-import { readJson, Tree } from '@nrwl/devkit';
+import { readJson, Tree } from '@nx/devkit';
 import isObject from 'lodash/isObject';
 
 import { cleanArray } from './clean-array';
